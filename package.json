@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write ."
   },
   "dependencies": {
     "next": "15.1.6",
@@ -16,6 +17,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",
     "@eslint/js": "^9.19.0",
+    "@it-incubator/prettier-config": "^0.1.2",
     "@next/eslint-plugin-next": "^15.1.6",
     "@types/node": "^20",
     "@types/react": "^19",
