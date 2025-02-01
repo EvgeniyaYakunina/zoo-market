@@ -1,3 +1,3 @@
-export const Admin=()=>{
-    return <div></div>
+export const Admin = () => {
+  return <div></div>
 }
