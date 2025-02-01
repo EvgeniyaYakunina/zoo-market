@@ -1,4 +1,4 @@
-import { palette } from '@/styles/pallete'
+import { palette } from '@/styles/palette'
 import type { Config } from 'tailwindcss'
 
 export default {
