@@ -10,9 +10,9 @@ export function Footer() {
   const { width } = useWindowResize()
 
   return (
-    <footer className="w-full bg-purple-700 py-12 mt-auto">
-      <div className="max-w-screen-2xl mx-auto px-8">
-        <div className="mb-8">
+    <footer className="w-full bg-blue-600 py-4 mt-auto">
+      <div className="max-w-7xl mx-auto px-2">
+        <div>
           {width && width < 1024 ? (
             <div className="flex flex-col">
               {/* Покупателям */}
@@ -161,7 +161,7 @@ export function Footer() {
           {/* Нижняя часть футера */}
           <div className="mt-8 text-gray-400 text-sm">
             <p>
-              2004-2023 © Zoo market — модный интернет-магазин одежды, обуви и аксессуаров для
+              2024-2025 © Zoo market — модный интернет-магазин одежды, обуви и аксессуаров для
               животных. Все права защищены.
             </p>
           </div>
