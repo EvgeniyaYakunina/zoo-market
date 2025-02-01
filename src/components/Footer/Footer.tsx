@@ -26,7 +26,7 @@ export function Footer() {
                   </li>
                   <li>
                     <a className="text-gray-300 hover:text-white" href="#">
-                      Способы оплаты
+                      Способы оплаты и не только
                     </a>
                   </li>
                   <li>
