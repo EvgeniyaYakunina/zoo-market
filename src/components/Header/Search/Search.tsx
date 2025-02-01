@@ -1,11 +1,11 @@
-type MyInputProps = {
+type SearchProps = {
     placeholder: string
     value: string
     setValue: (value: string) => void
     keyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void
 }
 
-const MyInput= ({ placeholder, value, setValue, keyDown }: MyInputProps) => {
+export const Search= ({ placeholder, value, setValue, keyDown }: SearchProps) => {
     return (
         <div className="w-full">
             <input
@@ -19,5 +19,3 @@ const MyInput= ({ placeholder, value, setValue, keyDown }: MyInputProps) => {
         </div>
     )
 }
-
-export default MyInput
