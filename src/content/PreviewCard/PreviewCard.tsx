@@ -14,7 +14,7 @@ export const PreviewCard = () => {
     <div className="px-10 py-6 flex justify-center w-full">
       <div className="w-full max-w-[1400px] flex items-start gap-8">
         {/* Левая колонка с миниатюрами и кнопкой "Назад" */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 ">
           <Link
             href="/"
             className="flex items-center gap-2 text-text-primary hover:text-text-secondary mb-4"
@@ -24,7 +24,10 @@ export const PreviewCard = () => {
           </Link>
 
           {[...Array(5)].map((_, idx) => (
-            <div key={idx} className="w-16 h-24 bg-bg-secondary rounded-lg overflow-hidden">
+            <div
+              key={idx}
+              className="w-16 h-24 bg-bg-secondary shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105"
+            >
               <Image
                 src={royal_canin || '/placeholder.svg'}
                 alt={`Thumbnail ${idx + 1}`}
@@ -37,7 +40,7 @@ export const PreviewCard = () => {
         </div>
 
         {/* Основное изображение */}
-        <div className="w-[400px] h-auto bg-bg-secondary rounded-lg overflow-hidden flex justify-center items-center">
+        <div className="w-[400px] h-auto shadow-md bg-bg-secondary rounded-lg overflow-hidden flex justify-center items-center">
           <Image
             src={royal_canin || '/placeholder.svg'}
             alt="Корм для кошек"
@@ -118,7 +121,7 @@ export const PreviewCard = () => {
           </div>
 
           {/* Кнопка в корзину */}
-          <Button fullWidth onClick={() => alert('add to cart')}>
+          <Button className={'text-white'} fullWidth onClick={() => alert('add to cart')}>
             Добавить в корзину
           </Button>
         </div>

@@ -1,8 +1,9 @@
 import Image, { StaticImageData } from 'next/image'
-import Link from 'next/link'
 import { useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
 import { Button } from '../ui'
+import { useRouter } from 'next/router'
+import { ROUTES } from '@/utils/routes'
 
 //TODO: maybe change
 export type ProductItemProps = {
@@ -19,14 +20,19 @@ export type ProductItemProps = {
   }
 }
 export const Card = ({ product }: ProductItemProps) => {
-  const { image, price, title, description, id } = product
+  const { image, price, title, description } = product
   const roundPrice = Math.floor(price)
   const [isActive, setIsActive] = useState(false)
+  const router = useRouter()
+  const handleClickCard = () => {
+    // router.push(`ROUTES.CARD/${id}`)
+    router.push(ROUTES.CARD)
+  }
 
   return (
     <div className="w-[250px] p-4">
-      <div className="bg-white shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105">
-        <Link href={`/informationProduct/${id}`} className="block text-inherit">
+      <div className="shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105">
+        <div onClick={handleClickCard} className="block text-inherit ">
           {/* Изображение товара */}
           <div className="relative group">
             <Image
@@ -50,7 +56,7 @@ export const Card = ({ product }: ProductItemProps) => {
               {title} <span className="text-gray-500">/ {description}</span>
             </p>
           </div>
-        </Link>
+        </div>
 
         {/* Кнопка добавления в корзину */}
         <div className="p-4">
