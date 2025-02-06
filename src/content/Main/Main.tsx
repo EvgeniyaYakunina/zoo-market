@@ -14,8 +14,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@radix-ui/react-accordion'
-// import {HiChevronDown} from "react-icons/hi";
-// import { ChevronDownIcon } from "@radix-ui/react-icons"
 import { useState } from 'react'
 import { royal_canin } from '@/assets'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
