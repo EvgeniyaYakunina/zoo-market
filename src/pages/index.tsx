@@ -1,3 +1,9 @@
+import { Main } from '@/content'
+
 export default function Home() {
-  return <div>ZooM</div>
+  return (
+    <div>
+      <Main />
+    </div>
+  )
 }
