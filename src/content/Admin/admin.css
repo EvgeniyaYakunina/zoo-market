@@ -1,0 +1,125 @@
+.container {
+  max-width: 1270px;
+  width: 100%;
+  padding: 0px 15px;
+
+  min-height: 300px;
+}
+
+.characteristicsBlock {
+  padding: 5px 10px;
+}
+
+.Title {
+  display: flex;
+  width: 100%;
+}
+
+.Title span {
+  display: inline-block;
+  border-bottom: 1px solid silver;
+  width: 100%;
+  padding: 5px 10px;
+}
+
+.characteristicsTitle {
+  display: flex;
+}
+
+.tablesBlock {
+  width: 100%;
+
+  input {
+    background-color: #ececec;
+  }
+}
+
+.tables {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid silver;
+  height: 52px;
+}
+
+.table {
+  width: 100%;
+  border-left: 1px solid silver;
+  padding: 5px 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.errorMessage {
+  color: red;
+}
+
+.hidden {
+  max-width: 270px;
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.tableWithChange {
+  width: 100%;
+  border-bottom: 1px solid silver;
+  padding: 5px 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tableWithChange2 {
+  width: 100%;
+  border-bottom: 1px solid silver;
+  padding: 5px 10px;
+  display: flex;
+}
+
+.table2 {
+  width: 100%;
+  border-left: 1px solid silver;
+  padding: 5px 0;
+  display: flex;
+}
+
+.table-card {
+  border: 1px solid red;
+  margin: 0 auto;
+  width: 80%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+
+  input,
+  textarea {
+    border: 1px solid silver;
+  }
+}
+
+.block-node {
+  display: flex;
+  gap: 30px;
+}
+
+.block-with-selectors-teg {
+  border: 1px solid green;
+  width: 100%;
+
+  div {
+    display: flex;
+    gap: 30px;
+  }
+}
+
+.selectors-with-out-teg {
+  border: 1px solid blue;
+  display: flex;
+  flex-direction: column;
+}
