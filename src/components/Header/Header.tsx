@@ -15,7 +15,7 @@ export const Header = () => {
 
   return (
     <>
-      <header className="fixed w-full z-10 top-0 p-4 bg-blue-600">
+      <header className="fixed w-full z-20 top-0 p-4 bg-accent-100">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center mt-2">
             <div className="mr-4">
