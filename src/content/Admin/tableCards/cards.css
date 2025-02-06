@@ -1,0 +1,40 @@
+.tableCards {
+  padding: 10px 20px;
+  width: 100%;
+
+  button {
+    color: white;
+  }
+}
+
+.blockTitleAndDescription {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 15px;
+  background-color: silver;
+  border-radius: 5px;
+  gap: 10px;
+  margin-bottom: 10px;
+
+  input,
+  textarea {
+    width: 100%;
+    padding: 5px 10px;
+    min-height: 30px;
+    width: 500px;
+  }
+}
+
+.titleAndDescription {
+  display: flex;
+  background-color: #2563eb;
+  align-items: center;
+
+  span {
+    width: 150px;
+    display: flex;
+    align-items: center;
+    padding: 10px 10px;
+    color: white;
+  }
+}
