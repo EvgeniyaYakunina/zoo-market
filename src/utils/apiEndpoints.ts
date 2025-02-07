@@ -1,5 +1,5 @@
 export const ApiEndpoints = {
-  BASE_URL: 'https://alekseyfgl-shop-3ca5.twc1.net/api',
+  BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL,
 
   // Characteristics
   GET_ALL_CHARACTERISTICS: (page: number, size: number) =>
