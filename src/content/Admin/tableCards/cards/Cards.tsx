@@ -7,6 +7,7 @@ import { RequestCreateCharacteristic } from '@/services/cards/cards.types'
 import { useGetAllNodeTypesQuery } from '@/services/nodeTypes/nodeType'
 import { SelectWithNodeTypes } from '@/content/Admin/tableCards/cards/card/selectWithNodeTypes/SelectWithNodeTypes'
 import { Button } from '@/components'
+import { charDefaultValueId } from '@/services/charDefaultValue/charDefaulValue.types'
 
 export const Cards = () => {
   const { data: allCharDefaultValue } = useGetAllCharDefaultValueQuery({ size: 100 })
@@ -53,7 +54,7 @@ export const Cards = () => {
             <SelectWithNodeTypes options={allNodeTypes?.items} getValue={setNodeTypeSelect} />
           </div>
         </div>
-        {allCharDefaultValue?.items.map(char => {
+        {allCharDefaultValue?.items.map((char: charDefaultValueId) => {
           if (!uniqueCharIds.has(char.characteristicId)) {
             // Проверяем, встречался ли ID ранее
             uniqueCharIds.add(char.characteristicId) // Добавляем ID в Set, если он уникальный

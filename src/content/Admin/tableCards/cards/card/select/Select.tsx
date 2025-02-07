@@ -23,7 +23,10 @@ export const Select = ({ options, getValue, tags, characteristicId }: Props) => 
   }
 
   return (
-    <select onChange={e => change(e.target.value)}>
+    <select defaultValue={'выберите'} onChange={e => change(e.target.value)}>
+      <option disabled value={'выберите'}>
+        {'выберите'}
+      </option>
       {options.map(o => (
         <option key={o.id} value={o.value}>
           {o.value}
