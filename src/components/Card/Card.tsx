@@ -40,7 +40,7 @@ export const Card = ({ product }: ProductItemProps) => {
               alt="product"
               width={200}
               height={200}
-              className="w-full h-60 object-contain bg-gray-100"
+              className="w-full h-60 object-contain bg-bg-secondary"
             />
             <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-accent-100 text-white text-sm px-4 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
               Быстрый просмотр
@@ -50,10 +50,10 @@ export const Card = ({ product }: ProductItemProps) => {
           {/* Описание товара */}
           <div className="p-4">
             <b className="text-lg font-semibold">
-              {roundPrice} $ <del className="text-gray-400">{roundPrice + 570}$</del>
+              {roundPrice} $ <del className="text-border-secondary">{roundPrice + 570}$</del>
             </b>
-            <p className="text-gray-700 text-sm">
-              {title} <span className="text-gray-500">/ {description}</span>
+            <p className="text-text-primary text-sm">
+              {title} <span className="text-text-secondary">/ {description}</span>
             </p>
           </div>
         </div>
@@ -63,7 +63,7 @@ export const Card = ({ product }: ProductItemProps) => {
           {isActive ? (
             <Button onClick={() => setIsActive}>В корзине</Button>
           ) : (
-            <Button className={'gap-2 text-white'} fullWidth>
+            <Button className={'gap-2 text-white text-base'} fullWidth>
               <span>
                 <BsCart2 />
               </span>{' '}

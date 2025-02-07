@@ -1,4 +1,4 @@
-import { royal_canin } from '@/assets'
+import { noImage } from '@/assets'
 import { Button } from '@/components'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -29,7 +29,7 @@ export const PreviewCard = () => {
               className="w-16 h-24 bg-bg-secondary shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105"
             >
               <Image
-                src={royal_canin || '/placeholder.svg'}
+                src={noImage || '/placeholder.svg'}
                 alt={`Thumbnail ${idx + 1}`}
                 width={64}
                 height={96}
@@ -42,7 +42,7 @@ export const PreviewCard = () => {
         {/* Основное изображение */}
         <div className="w-[400px] h-auto shadow-md bg-bg-secondary rounded-lg overflow-hidden flex justify-center items-center">
           <Image
-            src={royal_canin || '/placeholder.svg'}
+            src={noImage || '/placeholder.svg'}
             alt="Корм для кошек"
             width={400}
             height={500}
@@ -70,7 +70,7 @@ export const PreviewCard = () => {
                   onClick={() => setSelectedFlavor(idx)}
                 >
                   <Image
-                    src={royal_canin || '/placeholder.svg'}
+                    src={noImage || '/placeholder.svg'}
                     alt={`Flavor variant ${flavor}`}
                     width={56}
                     height={64}
