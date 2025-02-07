@@ -15,7 +15,7 @@ import {
   AccordionTrigger,
 } from '@radix-ui/react-accordion'
 import { useState } from 'react'
-import { royal_canin } from '@/assets'
+import { noImage } from '@/assets'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
 
 const categories = [
@@ -90,7 +90,7 @@ const Sidebar = ({ className }: { className?: string }) => {
 export const Main = () => {
   const products: ProductItemProps['product'][] = [
     {
-      image: royal_canin,
+      image: noImage,
       price: 100,
       title: 'Комбинезон 1',
       description: 'Описание комбинезона 1',
@@ -98,7 +98,7 @@ export const Main = () => {
       id: 1,
     },
     {
-      image: royal_canin,
+      image: noImage,
       price: 150,
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
@@ -106,7 +106,7 @@ export const Main = () => {
       id: 2,
     },
     {
-      image: royal_canin,
+      image: noImage,
       price: 150,
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
@@ -114,7 +114,7 @@ export const Main = () => {
       id: 2,
     },
     {
-      image: royal_canin,
+      image: noImage,
       price: 150,
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
@@ -122,7 +122,7 @@ export const Main = () => {
       id: 2,
     },
     {
-      image: royal_canin,
+      image: noImage,
       price: 150,
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
@@ -130,7 +130,7 @@ export const Main = () => {
       id: 2,
     },
     {
-      image: royal_canin,
+      image: noImage,
       price: 150,
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
@@ -138,7 +138,7 @@ export const Main = () => {
       id: 2,
     },
     {
-      image: royal_canin,
+      image: noImage,
       price: 150,
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
