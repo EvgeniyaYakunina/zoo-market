@@ -42,18 +42,18 @@ const Sidebar = ({ className }: { className?: string }) => {
   }
 
   return (
-    <aside className={`w-[20%] min-h-screen bg-gray-100 p-4 shadow-md ${className}`}>
+    <aside className={`w-[20%] min-h-screen bg-bg-secondary p-4 shadow-md ${className}`}>
       <Accordion type="multiple" className="w-full">
         {categories.map((category, index) => (
           <AccordionItem key={index} value={`item-${index}`} className="border-b">
-            <AccordionTrigger className=" group flex items-center justify-between w-full text-left py-2 px-4 font-medium hover:text-accent-100">
+            <AccordionTrigger className=" group flex items-center justify-between w-full text-left py-2 px-4 text-text-primary font-medium hover:text-accent-100">
               {category.name}
               <ChevronDownIcon
                 className="transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180"
                 aria-hidden
               />
             </AccordionTrigger>
-            <AccordionContent className="px-6 pb-2 text-gray-700">
+            <AccordionContent className="px-6 pb-2 text-text-primary">
               <ul className="space-y-2">
                 {category.subcategories.map((subcategory, subIndex) => (
                   <li key={subIndex} className="flex items-center space-x-2">
@@ -78,8 +78,10 @@ const Sidebar = ({ className }: { className?: string }) => {
         <span className="cursor-pointer hover:text-blue-500">Скидка</span>
       </div>
 
-      <div className="flex mx-6 mt-4 text-white">
-        <Button onClick={applyFilters}>Применить фильтры</Button>
+      <div className="flex mx-8 mt-4 text-white">
+        <Button className={'text-base'} onClick={applyFilters}>
+          Применить фильтры
+        </Button>
       </div>
     </aside>
   )
@@ -148,7 +150,7 @@ export const Main = () => {
   return (
     <div className="flex flex-col w-full">
       <Tabs onValueChange={value => console.log(value)}>
-        <div className="w-full bg-gray-300 shadow-md">
+        <div className="w-full bg-border-secondary shadow-md">
           <TabsList className="flex gap-4 py-2 max-w-4xl mx-auto">
             <TabsTrigger
               value="tab1"

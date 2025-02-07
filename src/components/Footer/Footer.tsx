@@ -10,90 +10,90 @@ export function Footer() {
   const { width } = useWindowResize()
 
   return (
-    <footer className="w-full bg-blue-600 py-4 mt-auto">
+    <footer className="w-full bg-accent-200 py-4 mt-auto">
       <div className="max-w-7xl mx-auto px-2">
         <div>
           {width && width < 1024 ? (
             <div className="flex flex-col">
               {/* Покупателям */}
-              <section className="border-b border-gray-300 py-4 relative">
+              <section className="border-b border-red py-4 relative">
                 <h2 className="text-white text-lg font-semibold">Покупателям</h2>
                 <ul className={`${display ? 'block' : 'hidden'} mt-3`}>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Как сделать заказ
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Способы оплаты и не только
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Доставка
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Возврат товара
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Возврат денежных средств
                     </a>
                   </li>
                 </ul>
                 <FaChevronDown
-                  className="absolute right-4 top-4 text-gray-400 cursor-pointer"
+                  className="absolute right-4 top-4 text-border-primary cursor-pointer"
                   onClick={() => setDisplay(!display)}
                 />
               </section>
 
               {/* Партнерам */}
-              <section className="border-b border-gray-300 py-4 relative">
+              <section className="border-b text-border-primary py-4 relative">
                 <h2 className="text-white text-lg font-semibold">Партнерам</h2>
                 <ul className={`${display1 ? 'block' : 'hidden'} mt-3`}>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Продавайте на Zoo market
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Водителем
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Курьерам
                     </a>
                   </li>
                 </ul>
                 <FaChevronDown
-                  className="absolute right-4 top-4 text-gray-400 cursor-pointer"
+                  className="absolute right-4 top-4 text-border-primary cursor-pointer"
                   onClick={() => setDisplay1(!display1)}
                 />
               </section>
 
               {/* Компания */}
-              <section className="border-b border-gray-300 py-4 relative">
+              <section className="border-b text-border-primary py-4 relative">
                 <h2 className="text-white text-lg font-semibold">Компания</h2>
                 <ul className={`${display2 ? 'block' : 'hidden'} mt-3`}>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       О нас
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Реквизиты
                     </a>
                   </li>
                 </ul>
                 <FaChevronDown
-                  className="absolute right-4 top-4 text-gray-400 cursor-pointer"
+                  className="absolute right-4 top-4 text-border-primary cursor-pointer"
                   onClick={() => setDisplay2(!display2)}
                 />
               </section>
@@ -105,17 +105,17 @@ export function Footer() {
                 <h2 className="text-white text-lg font-semibold mb-4">Покупателям</h2>
                 <ul>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Как сделать заказ
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Способы оплаты
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Доставка
                     </a>
                   </li>
@@ -132,7 +132,7 @@ export function Footer() {
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Водителем
                     </a>
                   </li>
@@ -144,12 +144,12 @@ export function Footer() {
                 <h2 className="text-white text-lg font-semibold mb-4">Компания</h2>
                 <ul>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       О нас
                     </a>
                   </li>
                   <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
+                    <a className="text-border-primary hover:text-white" href="#">
                       Реквизиты
                     </a>
                   </li>
@@ -159,7 +159,7 @@ export function Footer() {
           )}
 
           {/* Нижняя часть футера */}
-          <div className="mt-8 text-gray-400 text-sm">
+          <div className="mt-8 text-border-primary text-sm">
             <p>
               2024-2025 © Zoo market — модный интернет-магазин одежды, обуви и аксессуаров для
               животных. Все права защищены.
