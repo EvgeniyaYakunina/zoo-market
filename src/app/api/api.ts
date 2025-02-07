@@ -1,6 +1,24 @@
 import { ApiEndpoints } from '@/utils'
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { CharacteristicsResponse } from './api.types'
+import {
+  AllFiltersResponse,
+  Characteristic,
+  CharacteristicDefaultValue,
+  CharacteristicDefaultValuesResponse,
+  CharacteristicsResponse,
+  CreateCharacteristicRequest,
+  NodesResponse,
+  NodeType,
+  Node,
+  NodeTypesResponse,
+  UpdateCharacteristicRequest,
+  UpdateCharacteristicResponse,
+  CreateCardResponse,
+  CreateCardRequest,
+  CardDetails,
+  AllCardsResponse,
+  CardItem,
+} from './api.types'
 
 const {
   GET_ALL_CHARACTERISTICS,
@@ -38,52 +56,65 @@ export const api = createApi({
     getAllCharacteristics: builder.query<CharacteristicsResponse, { page: number; size: number }>({
       query: ({ page, size }) => GET_ALL_CHARACTERISTICS(page, size),
     }),
-    createCharacteristic: builder.mutation({
-      query: body => ({
+    createCharacteristic: builder.mutation<Characteristic, CreateCharacteristicRequest>({
+      query: (body: CreateCharacteristicRequest) => ({
         url: CREATE_CHARACTERISTIC,
         method: 'POST',
         body,
       }),
     }),
-    updateCharacteristic: builder.mutation({
-      query: body => ({
-        url: UPDATE_CHARACTERISTIC,
+
+    updateCharacteristic: builder.mutation<
+      UpdateCharacteristicResponse,
+      UpdateCharacteristicRequest
+    >({
+      query: (body: UpdateCharacteristicRequest) => ({
+        url: `${UPDATE_CHARACTERISTIC}/${body.id}`,
         method: 'PUT',
         body,
       }),
     }),
-    deleteCharacteristic: builder.mutation({
+    deleteCharacteristic: builder.mutation<{ id: number }, number>({
       query: id => ({
         url: DELETE_CHARACTERISTIC(id),
         method: 'DELETE',
       }),
     }),
-    getAllFilters: builder.query({
+    getAllFilters: builder.query<AllFiltersResponse, void>({
       query: () => GET_ALL_FILTERS,
     }),
 
     // Characteristic Default Values
-    getAllCharDefaultValues: builder.query({
-      query: () => GET_ALL_CHAR_DEFAULT_VALUES,
+    getAllCharDefaultValues: builder.query<
+      CharacteristicDefaultValuesResponse,
+      { page: number; size: number }
+    >({
+      query: ({ page, size }) => GET_ALL_CHAR_DEFAULT_VALUES(page, size),
     }),
-    getCharDefaultValueById: builder.query({
+    getCharDefaultValueById: builder.query<CharacteristicDefaultValue, number>({
       query: id => GET_CHAR_DEFAULT_VALUE_BY_ID(id),
     }),
-    createCharDefaultValue: builder.mutation({
-      query: body => ({
+    createCharDefaultValue: builder.mutation<
+      Omit<CharacteristicDefaultValue, 'title'>,
+      { characteristicId: number; value: string }
+    >({
+      query: (body: { characteristicId: number; value: string }) => ({
         url: CREATE_CHAR_DEFAULT_VALUE,
         method: 'POST',
         body,
       }),
     }),
-    updateCharDefaultValue: builder.mutation({
-      query: body => ({
+    updateCharDefaultValue: builder.mutation<
+      Omit<CharacteristicDefaultValue, 'title'>,
+      { id: number; value: string }
+    >({
+      query: (body: { id: number; value: string }) => ({
         url: UPDATE_CHAR_DEFAULT_VALUE,
         method: 'PUT',
         body,
       }),
     }),
-    deleteCharDefaultValue: builder.mutation({
+    deleteCharDefaultValue: builder.mutation<{ id: number }, number>({
       query: id => ({
         url: DELETE_CHAR_DEFAULT_VALUE(id),
         method: 'DELETE',
@@ -91,24 +122,24 @@ export const api = createApi({
     }),
 
     // Node Types
-    getAllNodeTypes: builder.query({
+    getAllNodeTypes: builder.query<NodeTypesResponse, { page: number; size: number }>({
       query: ({ page, size }) => GET_ALL_NODE_TYPES(page, size),
     }),
-    createNodeType: builder.mutation({
-      query: body => ({
+    createNodeType: builder.mutation<NodeType, { type: string; description: string | null }>({
+      query: (body: { type: string; description: string | null }) => ({
         url: CREATE_NODE_TYPE,
         method: 'POST',
         body,
       }),
     }),
-    updateNodeType: builder.mutation({
-      query: body => ({
+    updateNodeType: builder.mutation<NodeType, NodeType>({
+      query: (body: NodeType) => ({
         url: UPDATE_NODE_TYPE,
         method: 'PUT',
         body,
       }),
     }),
-    deleteNodeType: builder.mutation({
+    deleteNodeType: builder.mutation<{ id: number }, number>({
       query: id => ({
         url: DELETE_NODE_TYPE(id),
         method: 'DELETE',
@@ -116,24 +147,31 @@ export const api = createApi({
     }),
 
     // Nodes
-    getAllNodes: builder.query({
+    getAllNodes: builder.query<NodesResponse, { page: number; size: number }>({
       query: ({ page, size }) => GET_ALL_NODES(page, size),
     }),
-    createNode: builder.mutation({
-      query: body => ({
+    createNode: builder.mutation<
+      Node,
+      { title: string; nodeTypeId: number; description: string | null }
+    >({
+      query: (body: { title: string; nodeTypeId: number; description: string | null }) => ({
         url: CREATE_NODE,
         method: 'POST',
         body,
       }),
     }),
-    updateNode: builder.mutation({
+    //TODO: check response type
+    updateNode: builder.mutation<
+      unknown,
+      Pick<Node, 'id' | 'title' | 'nodeTypeId' | 'description'>
+    >({
       query: body => ({
         url: UPDATE_NODE,
         method: 'PUT',
         body,
       }),
     }),
-    deleteNode: builder.mutation({
+    deleteNode: builder.mutation<{ id: number }, number>({
       query: id => ({
         url: DELETE_NODE(id),
         method: 'DELETE',
@@ -141,20 +179,20 @@ export const api = createApi({
     }),
 
     // Cards
-    createCard: builder.mutation({
-      query: body => ({
+    createCard: builder.mutation<CreateCardResponse, CreateCardRequest>({
+      query: (body: CreateCardRequest) => ({
         url: CREATE_CARD,
         method: 'POST',
         body,
       }),
     }),
-    getCardById: builder.query({
+    getCardById: builder.query<CardDetails, number>({
       query: id => GET_CARD_BY_ID(id),
     }),
-    getAllCards: builder.query({
+    getAllCards: builder.query<AllCardsResponse, void>({
       query: () => GET_ALL_CARDS,
     }),
-    searchCards: builder.mutation({
+    searchCards: builder.mutation<CardItem[], { text: string; limit: number }>({
       query: body => ({
         url: SEARCH_CARDS,
         method: 'POST',
@@ -162,6 +200,7 @@ export const api = createApi({
       }),
     }),
 
+    //TODO: check need it or not
     // Files
     deleteFilesByNodeId: builder.mutation({
       query: id => ({

@@ -10,8 +10,8 @@ export const ApiEndpoints = {
   GET_ALL_FILTERS: 'characteristics/filters',
 
   // Characteristic Default Values
-  //TODO: check this endpoint
-  GET_ALL_CHAR_DEFAULT_VALUES: 'selectors',
+  GET_ALL_CHAR_DEFAULT_VALUES: (page: number, size: number) =>
+    `selectors?page=${page}&size=${size}`,
   GET_CHAR_DEFAULT_VALUE_BY_ID: (id: number) => `selectors/${id}`,
   CREATE_CHAR_DEFAULT_VALUE: 'selectors',
   UPDATE_CHAR_DEFAULT_VALUE: 'selectors',
