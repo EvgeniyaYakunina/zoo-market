@@ -2,12 +2,9 @@ import { IoPerson } from 'react-icons/io5'
 import { BsCart2 } from 'react-icons/bs'
 import { ROUTES } from '@/utils/routes'
 import { useRouter } from 'next/router'
+import { CartProps } from '@/components'
 
-export type SignUpAndBasketProps = {
-  carts: { id: number; name: string; price: number }[]
-}
-
-export const SignUpAndBasket = ({ carts }: SignUpAndBasketProps) => {
+export const SignUpAndBasket = ({ carts }: { carts: CartProps[] }) => {
   const router = useRouter()
   return (
     <div className="flex space-x-6 px-4">

@@ -88,7 +88,7 @@ const Sidebar = ({ className }: { className?: string }) => {
 export const Main = () => {
   const products: ProductItemProps['product'][] = [
     {
-      image: royal_canin,
+      image: royal_canin || '',
       price: 100,
       title: 'Комбинезон 1',
       description: 'Описание комбинезона 1',
@@ -109,7 +109,7 @@ export const Main = () => {
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
       rating: { rate: 4.2, count: 15 },
-      id: 2,
+      id: 3,
     },
     {
       image: royal_canin,
@@ -117,7 +117,7 @@ export const Main = () => {
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
       rating: { rate: 4.2, count: 15 },
-      id: 2,
+      id: 4,
     },
     {
       image: royal_canin,
@@ -125,7 +125,7 @@ export const Main = () => {
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
       rating: { rate: 4.2, count: 15 },
-      id: 2,
+      id: 5,
     },
     {
       image: royal_canin,
@@ -133,7 +133,7 @@ export const Main = () => {
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
       rating: { rate: 4.2, count: 15 },
-      id: 2,
+      id: 6,
     },
     {
       image: royal_canin,
@@ -141,7 +141,7 @@ export const Main = () => {
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
       rating: { rate: 4.2, count: 15 },
-      id: 2,
+      id: 7,
     },
   ]
 
