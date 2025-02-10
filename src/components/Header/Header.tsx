@@ -32,7 +32,7 @@ export const Header = () => {
           <div className="flex items-center mt-2">
             <div className="mr-4">
               <div
-                className="text-white text-2xl font-semibold"
+                className="text-white text-4xl font-semibold"
                 onClick={() => router.push(ROUTES.HOME)}
               >
                 {'ZooMarket'}
@@ -59,7 +59,7 @@ export const Header = () => {
                 className={`w-6 h-6 cursor-pointer`}
               />
               {carts.length > 0 && (
-                <span className="absolute -top-2 -right-3 text-xs w-5 h-5 bg-red-500 text-white rounded-full text-center">
+                <span className="absolute -top-2 -right-3 text-xs w-5 h-5 bg-bg-red-500 text-white rounded-full text-center">
                   {carts.length}
                 </span>
               )}

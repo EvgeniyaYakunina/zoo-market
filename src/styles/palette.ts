@@ -13,6 +13,7 @@ export const palette = {
     primary: '#FFFFFF', //white
     secondary: '#F5F5F5', //light gray
     highlight: '#FFF9C4', //yellow
+    'red-500': '#ef4444',
   },
   border: {
     primary: '#E0E0E0', //light gray

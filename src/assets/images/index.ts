@@ -1,1 +1,1 @@
-export { default as royal_canin } from './royal_canin.webp'
+export { default as noImage } from './noImage.jpg'
