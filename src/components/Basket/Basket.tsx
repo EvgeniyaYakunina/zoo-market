@@ -12,15 +12,15 @@ function BasketFormSidebar({ carts = [] }: { carts?: CartItem[] }) {
   )
 
   return (
-    <div className="w-[360px] h-[270px] lg:w-full">
+    <div className="w-full lg:w-[360px]">
       <div className="bg-white rounded-2xl">
         <div className="p-6">
           <div className="mb-4">
             <p className="flex justify-between">
-              <span className="text-sm text-[#868695] mb-2">
+              <span className="text-sm text-text-muted mb-2">
                 Товары, <span>{totalItems} шт</span>
               </span>
-              <span className="text-sm text-[#868695] mb-2">{finalPrice} $</span>
+              <span className="text-sm text-text-primary mb-2">{finalPrice} $</span>
             </p>
 
             <div className="flex justify-between">
@@ -29,7 +29,7 @@ function BasketFormSidebar({ carts = [] }: { carts?: CartItem[] }) {
             </div>
           </div>
 
-          <Button>Заказать</Button>
+          <Button fullWidth>Заказать</Button>
         </div>
       </div>
     </div>
@@ -43,43 +43,32 @@ export const Basket = () => {
     router.push(ROUTES.HOME)
   }
 
-  // useEffect(() => {
-  //     const updateCart = () => {
-  //         const storedCart = JSON.parse(localStorage.getItem('cart') || '[]');
-  //         setCarts(Array.isArray(storedCart) ? storedCart : []);
-  //     };
-  //
-  //     updateCart();
-  //     window.addEventListener("storage", updateCart); // Слушаем изменения в localStorage
-  //
-  //     return () => window.removeEventListener("storage", updateCart);
-  // }, []);
-
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
     setCarts(storedCart)
   }, [])
 
   return (
-    <div className="bg-[#f9f8f8] min-w-[20em]">
+    <div className="bg-bg-secondary/20 min-w-[20em]">
       {carts.length == 0 ? (
         <div className="flex justify-center items-center m-4 md:m-8 p-8 bg-white rounded-2xl">
           <div className="w-[22em] flex items-center text-center flex-col">
             <h2 className="mb-3">В корзине пока пусто</h2>
-            <p className="text-[#868695] text-base leading-[22px] mb-4">
+            <p className="text-text-primary text-base leading-[22px] mb-4">
               Загляните на главную, чтобы выбрать товары или найдите нужное в поиске
             </p>
             <Button onClick={handleBackToMain}>Перейти в главную</Button>
           </div>
         </div>
       ) : (
-        <form className="flex justify-center p-8 lg:block">
-          <div className="mr-10 lg:mr-0">
+        <div className="flex flex-col lg:flex-row gap-8 p-8 mx-8">
+          <div className="flex-1">
             <BasketList carts={carts} setCarts={setCarts} />
           </div>
-
-          <BasketFormSidebar carts={carts} />
-        </form>
+          <div className="w-full lg:w-[360px]">
+            <BasketFormSidebar carts={carts} />
+          </div>
+        </div>
       )}
     </div>
   )

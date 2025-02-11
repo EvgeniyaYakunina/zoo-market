@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { MdOutlineDeleteOutline } from 'react-icons/md'
 import Image from 'next/image'
+import { noImage } from '@/assets'
 
 export type CartItem = {
   image: string
@@ -65,19 +66,19 @@ function BasketItem({ cart, setCarts }: CartProps) {
         <div className="flex max-w-[560px] w-full">
           <div>
             {image ? (
+              <Image src={image} alt={title} width={96} height={128} className="rounded-2xl mr-5" />
+            ) : (
               <Image
-                src={image}
-                alt="картинка"
+                src={noImage}
+                alt={'noImage'}
                 width={96}
                 height={128}
                 className="rounded-2xl mr-5"
               />
-            ) : (
-              <div className="h-32 w-24 bg-gray-300 rounded-2xl mr-5"></div> // Заглушка
             )}
           </div>
           <div className="flex flex-col">
-            <div className="text-[#242424] break-words">{title}</div>
+            <div className="text-text-primary break-words">{title}</div>
           </div>
         </div>
 
@@ -85,7 +86,7 @@ function BasketItem({ cart, setCarts }: CartProps) {
           <button
             onClick={decrement}
             type="button"
-            className="w-8 h-8 border-none rounded-lg bg-[#f1f1f5] text-lg cursor-pointer hover:bg-[#d7d7dd]"
+            className="w-8 h-8 border-none rounded-lg bg-border-primary/20 text-lg cursor-pointer hover:bg-[#d7d7dd]"
           >
             -
           </button>
@@ -99,7 +100,7 @@ function BasketItem({ cart, setCarts }: CartProps) {
           <button
             onClick={increment}
             type="button"
-            className="w-8 h-8 border-none rounded-lg bg-[#f1f1f5] text-lg cursor-pointer hover:bg-[#d7d7dd]"
+            className="w-8 h-8 border-none rounded-lg bg-border-primary/20 text-lg cursor-pointer hover:bg-[#d7d7dd]"
           >
             +
           </button>
@@ -109,7 +110,7 @@ function BasketItem({ cart, setCarts }: CartProps) {
       <div className="w-[195px] text-right">
         <div className="all_price_basket_product">
           <h3 className="text-lg leading-6">{roundPrice * value} $</h3>
-          <del className="text-sm leading-5 mt-1 text-[#868695] font-normal">
+          <del className="text-sm leading-5 mt-1 text-text-muted font-normal">
             {(roundPrice + 570) * value} $
           </del>
         </div>
@@ -120,7 +121,7 @@ function BasketItem({ cart, setCarts }: CartProps) {
             type="button"
             className="bg-transparent border-none cursor-pointer ml-3"
           >
-            <MdOutlineDeleteOutline className="w-6 h-6 text-[#a6a6a6]" />
+            <MdOutlineDeleteOutline className="w-6 h-6 text-text-muted" />
           </button>
         </div>
       </div>
@@ -138,7 +139,7 @@ export const BasketList = ({
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">
-        Корзина <span className="text-gray-600">({carts.length})</span>
+        Корзина <span className="text-text-secondary">({carts.length})</span>
       </h2>
 
       {carts.map(cartItem => (
