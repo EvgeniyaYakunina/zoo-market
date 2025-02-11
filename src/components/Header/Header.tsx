@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Search, SignUpAndBasket, SignUpAndBasketProps } from '@/components'
+import { useEffect, useState } from 'react'
+import { CartItem, Search, SignUpAndBasket } from '@/components'
 import { BsCart2 } from 'react-icons/bs'
 import { GoHomeFill } from 'react-icons/go'
 import { IoPerson } from 'react-icons/io5'
@@ -11,7 +11,21 @@ export const Header = () => {
   const router = useRouter()
   const { width } = useWindowResize()
   const [value, setValue] = useState<string>('')
-  const carts: SignUpAndBasketProps['carts'] = [{ id: 1, name: 'Carts', price: 130 }]
+  const [carts, setCarts] = useState<CartItem[]>([])
+
+  const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
+
+  useEffect(() => {
+    const updateCart = () => {
+      const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
+      setCarts(Array.isArray(storedCart) ? storedCart : [])
+    }
+
+    updateCart()
+    window.addEventListener('cartUpdated', updateCart)
+
+    return () => window.removeEventListener('cartUpdated', updateCart)
+  }, [])
 
   return (
     <>
@@ -31,12 +45,13 @@ export const Header = () => {
           </div>
         </div>
       </header>
+
       {width && width < 900 && (
         <div className="border-t border-gray-300 block bg-white w-full p-4 fixed bottom-0 z-50 shadow-md md:hidden">
           <ul className="flex justify-around">
             <li>
               <GoHomeFill
-                onClick={() => router.push(ROUTES.SIGN_IN)}
+                onClick={() => router.push(ROUTES.HOME)}
                 className={`w-6 h-6 cursor-pointer`}
               />
             </li>
@@ -45,9 +60,9 @@ export const Header = () => {
                 onClick={() => router.push(ROUTES.BASKET)}
                 className={`w-6 h-6 cursor-pointer`}
               />
-              {carts.length > 0 && (
+              {totalItems > 0 && (
                 <span className="absolute -top-2 -right-3 text-xs w-5 h-5 bg-bg-red-500 text-white rounded-full text-center">
-                  {carts.length}
+                  {totalItems}
                 </span>
               )}
             </li>

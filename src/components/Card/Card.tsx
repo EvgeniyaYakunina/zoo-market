@@ -1,14 +1,15 @@
 import Image, { StaticImageData } from 'next/image'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
 import { Button } from '../ui'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
+import { CartItem } from '@/components'
 
 //TODO: maybe change
 export type ProductItemProps = {
   product: {
-    image: StaticImageData
+    image: string | StaticImageData
     price: number
     title: string
     description: string
@@ -22,8 +23,35 @@ export type ProductItemProps = {
 export const Card = ({ product }: ProductItemProps) => {
   const { image, price, title, description } = product
   const roundPrice = Math.floor(price)
-  const [isActive, setIsActive] = useState(false)
   const router = useRouter()
+  const [isInCart, setIsInCart] = useState(false)
+
+  // Проверяем, есть ли товар в корзине при загрузке
+  useEffect(() => {
+    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]')
+    setIsInCart(cartItems.some((item: CartItem) => item.id === product.id))
+  }, [product.id])
+
+  const addToCart = () => {
+    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
+    const productToAdd = {
+      id: product.id,
+      image: product.image,
+      price: product.price,
+      title: product.title,
+      description: product.description,
+      rating: product.rating,
+      quantity: 1,
+    }
+
+    if (!storedCart.some((item: CartItem) => item.id === productToAdd.id)) {
+      const updatedCart = [...storedCart, productToAdd]
+      localStorage.setItem('cart', JSON.stringify(updatedCart))
+      setIsInCart(true)
+      window.dispatchEvent(new Event('cartUpdated')) // Обновляем Header
+    }
+  }
+
   const handleClickCard = () => {
     // router.push(`ROUTES.CARD/${id}`)
     router.push(ROUTES.CARD)
@@ -60,10 +88,12 @@ export const Card = ({ product }: ProductItemProps) => {
 
         {/* Кнопка добавления в корзину */}
         <div className="p-4">
-          {isActive ? (
-            <Button onClick={() => setIsActive}>В корзине</Button>
+          {isInCart ? (
+            <Button disabled fullWidth>
+              В корзине
+            </Button>
           ) : (
-            <Button className={'gap-2 text-white text-base'} fullWidth>
+            <Button className={'gap-2 text-white text-base'} fullWidth onClick={addToCart}>
               <span>
                 <BsCart2 />
               </span>{' '}

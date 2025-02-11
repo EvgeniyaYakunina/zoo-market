@@ -111,7 +111,7 @@ export const Main = () => {
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
       rating: { rate: 4.2, count: 15 },
-      id: 2,
+      id: 3,
     },
     {
       image: noImage,
@@ -119,7 +119,7 @@ export const Main = () => {
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
       rating: { rate: 4.2, count: 15 },
-      id: 2,
+      id: 4,
     },
     {
       image: noImage,
@@ -127,7 +127,7 @@ export const Main = () => {
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
       rating: { rate: 4.2, count: 15 },
-      id: 2,
+      id: 5,
     },
     {
       image: noImage,
@@ -135,7 +135,7 @@ export const Main = () => {
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
       rating: { rate: 4.2, count: 15 },
-      id: 2,
+      id: 6,
     },
     {
       image: noImage,
@@ -143,7 +143,7 @@ export const Main = () => {
       title: 'Комбинезон 2',
       description: 'Описание комбинезона 2',
       rating: { rate: 4.2, count: 15 },
-      id: 2,
+      id: 7,
     },
   ]
 
