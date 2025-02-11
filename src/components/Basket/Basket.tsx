@@ -1,5 +1,4 @@
-import { BasketList, CartItem } from '@/components/Basket/BasketList'
-import { Button } from '@/components'
+import { BasketList, Button, CartItem } from '@/components'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
