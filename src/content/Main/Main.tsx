@@ -17,6 +17,7 @@ import {
 import { useState } from 'react'
 import { noImage } from '@/assets'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
+import { useGetAllNodeTypesQuery } from '@/app/api'
 
 const categories = [
   { name: 'Категория 1', subcategories: ['Подкатегория 1', 'Подкатегория 2', 'Подкатегория 3'] },
@@ -88,6 +89,7 @@ const Sidebar = ({ className }: { className?: string }) => {
 }
 
 export const Main = () => {
+  const { data: nodeTypes } = useGetAllNodeTypesQuery({ page: 1, size: 10 })
   const products: ProductItemProps['product'][] = [
     {
       image: noImage,
@@ -146,42 +148,21 @@ export const Main = () => {
       id: 7,
     },
   ]
-
+  console.log(nodeTypes)
   return (
     <div className="flex flex-col w-full">
       <Tabs onValueChange={value => console.log(value)}>
         <div className="w-full bg-border-secondary shadow-md">
-          <TabsList className="flex gap-4 py-2 max-w-4xl mx-auto">
-            <TabsTrigger
-              value="tab1"
-              className="text-white text-xl font-bold hover:text-accent-100"
-            >
-              Комбинезоны
-            </TabsTrigger>
-            <TabsTrigger
-              value="tab2"
-              className="text-white text-xl font-bold hover:text-accent-100"
-            >
-              Майки
-            </TabsTrigger>
-            <TabsTrigger
-              value="tab3"
-              className="text-white text-xl font-bold hover:ttext-accent-100"
-            >
-              Повязки
-            </TabsTrigger>
-            <TabsTrigger
-              value="tab4"
-              className="text-white text-xl font-bold hover:text-accent-100"
-            >
-              Ботинки
-            </TabsTrigger>
-            <TabsTrigger
-              value="tab5"
-              className="text-white text-xl font-bold hover:text-accent-100"
-            >
-              Жилеты
-            </TabsTrigger>
+          <TabsList className="flex flex-wrap max-w-4xl gap-4 py-2 px-4 mx-auto">
+            {nodeTypes?.items.map(nodeType => (
+              <TabsTrigger
+                key={nodeType.id}
+                value={nodeType.type}
+                className="text-white text-xl font-bold hover:text-accent-100 whitespace-nowrap"
+              >
+                {nodeType.type}
+              </TabsTrigger>
+            ))}
           </TabsList>
         </div>
 
@@ -190,26 +171,16 @@ export const Main = () => {
           <Sidebar />
 
           <div className="w-[80%] p-4">
-            <TabsContent value="tab1">
-              <h2 className="text-2xl font-bold text-center mb-4">Комбинезоны</h2>
-              <div className="flex flex-wrap justify-center">
-                {products.map(product => (
-                  <Card key={product.id} product={product} />
-                ))}
-              </div>
-            </TabsContent>
-            <TabsContent value="tab2">
-              <h2 className="text-2xl font-bold text-center mb-4">Майки</h2>
-            </TabsContent>
-            <TabsContent value="tab3">
-              <h2 className="text-2xl font-bold text-center mb-4">Повязки</h2>
-            </TabsContent>
-            <TabsContent value="tab4">
-              <h2 className="text-2xl font-bold text-center mb-4">Ботинки</h2>
-            </TabsContent>
-            <TabsContent value="tab5">
-              <h2 className="text-2xl font-bold text-center mb-4">Жилеты</h2>
-            </TabsContent>
+            {nodeTypes?.items.map(nodeType => (
+              <TabsContent key={nodeType.id} value={nodeType.type}>
+                <h2 className="text-2xl font-bold text-center mb-4">{nodeType.type}</h2>
+                <div className="flex flex-wrap justify-center">
+                  {products.map(product => (
+                    <Card key={product.id} product={product} />
+                  ))}
+                </div>
+              </TabsContent>
+            ))}
           </div>
         </div>
       </Tabs>
