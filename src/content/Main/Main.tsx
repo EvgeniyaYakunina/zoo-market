@@ -153,7 +153,7 @@ export const Main = () => {
     <div className="flex flex-col w-full">
       <Tabs onValueChange={value => console.log(value)}>
         <div className="w-full bg-border-secondary shadow-md">
-          <TabsList className="flex flex-wrap max-w-4xl gap-4 py-2 px-4 mx-auto">
+          <TabsList className="flex flex-wrap gap-4 py-2 px-4 mx-auto">
             {nodeTypes?.items.map(nodeType => (
               <TabsTrigger
                 key={nodeType.id}
