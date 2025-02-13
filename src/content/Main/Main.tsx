@@ -17,17 +17,10 @@ import {
 import { useState } from 'react'
 import { noImage } from '@/assets'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
-import { useGetAllNodeTypesQuery } from '@/app/api'
-
-const categories = [
-  { name: 'Категория 1', subcategories: ['Подкатегория 1', 'Подкатегория 2', 'Подкатегория 3'] },
-  { name: 'Категория 2', subcategories: ['Подкатегория 1', 'Подкатегория 2'] },
-  { name: 'Категория 3', subcategories: ['Подкатегория 1', 'Подкатегория 2', 'Подкатегория 3'] },
-  { name: 'Категория 4', subcategories: ['Подкатегория 1'] },
-  { name: 'Категория 5', subcategories: ['Подкатегория 1', 'Подкатегория 2'] },
-]
+import { useGetAllFiltersQuery, useGetAllNodeTypesQuery } from '@/app/api'
 
 const Sidebar = ({ className }: { className?: string }) => {
+  const { data: allFilters } = useGetAllFiltersQuery()
   const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: boolean }>({})
 
   const handleCheckboxChange = (filterKey: string) => {
@@ -45,10 +38,10 @@ const Sidebar = ({ className }: { className?: string }) => {
   return (
     <aside className={`w-[20%] min-h-screen bg-bg-secondary p-4 shadow-md ${className}`}>
       <Accordion type="multiple" className="w-full">
-        {categories.map((category, index) => (
+        {allFilters?.map((filter, index) => (
           <AccordionItem key={index} value={`item-${index}`} className="border-b">
             <AccordionTrigger className=" group flex items-center justify-between w-full text-left py-2 px-4 text-text-primary font-medium hover:text-accent-100">
-              {category.name}
+              {filter.title}
               <ChevronDownIcon
                 className="transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180"
                 aria-hidden
@@ -56,13 +49,13 @@ const Sidebar = ({ className }: { className?: string }) => {
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-2 text-text-primary">
               <ul className="space-y-2">
-                {category.subcategories.map((subcategory, subIndex) => (
+                {filter.values.map((value, subIndex) => (
                   <li key={subIndex} className="flex items-center space-x-2">
                     <Checkbox
-                      checked={selectedFilters[subcategory] || false}
-                      onCheckedChange={() => handleCheckboxChange(subcategory)}
+                      checked={selectedFilters[value] || false}
+                      onCheckedChange={() => handleCheckboxChange(value)}
                     />
-                    <span className="cursor-pointer hover:text-blue-500">{subcategory}</span>
+                    <span className="cursor-pointer hover:text-blue-500">{value}</span>
                   </li>
                 ))}
               </ul>
