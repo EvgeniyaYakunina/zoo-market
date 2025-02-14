@@ -7,7 +7,7 @@ import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { useWindowResize } from '@/hooks'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/app/store'
+import { RootState } from '@/app/store/store'
 
 export const Header = () => {
   const router = useRouter()

@@ -153,8 +153,9 @@ export type CardDetails = Omit<Node, 'nodeTypeId'> & {
 }
 
 // Новый тип для отдельной карточки в ответе getAllCards
-export type CardItem = Omit<Node, 'id' | 'nodeTypeId'> & {
+export type CardItem = Omit<Node, 'id' | 'nodeTypeId' | 'description'> & {
   nodeId: number
+  nodeDescription: string | null
   images: string[]
   nodeType: string
   nodeTypeDescription: string | null
