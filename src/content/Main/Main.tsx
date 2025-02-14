@@ -18,6 +18,8 @@ import { useState } from 'react'
 import { noImage } from '@/assets'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
 import { useGetAllFiltersQuery, useGetAllNodeTypesQuery } from '@/app/api'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/store'
 
 const Sidebar = ({ className }: { className?: string }) => {
   const { data: allFilters } = useGetAllFiltersQuery()
@@ -83,6 +85,8 @@ const Sidebar = ({ className }: { className?: string }) => {
 
 export const Main = () => {
   const { data: nodeTypes } = useGetAllNodeTypesQuery({ page: 1, size: 10 })
+  const cards = useSelector((state: RootState) => state.cards.cards)
+  console.log(cards)
   const products: ProductItemProps['product'][] = [
     {
       image: noImage,
@@ -171,6 +175,18 @@ export const Main = () => {
                   {products.map(product => (
                     <Card key={product.id} product={product} />
                   ))}
+                  {/*{cards*/}
+                  {/*    .filter(card => card.nodeType === nodeType.type)*/}
+                  {/*    .map(card => (*/}
+                  {/*        <Card key={card.nodeId} product={{*/}
+                  {/*          image: card.images[0] || noImage,*/}
+                  {/*          price: 100,*/}
+                  {/*          title: card.title,*/}
+                  {/*          description: card.nodeTypeDescription || '',*/}
+                  {/*          rating: { rate: 4.5, count: 10 },*/}
+                  {/*          id: card.nodeId,*/}
+                  {/*        }} />*/}
+                  {/*    ))}*/}
                 </div>
               </TabsContent>
             ))}
