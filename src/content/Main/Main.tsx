@@ -1,13 +1,4 @@
-import {
-  Button,
-  Card,
-  Checkbox,
-  ProductItemProps,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@/components'
+import { Button, Card, Checkbox, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components'
 import {
   Accordion,
   AccordionContent,
@@ -17,17 +8,17 @@ import {
 import { useState } from 'react'
 import { noImage } from '@/assets'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
-import { useGetAllNodeTypesQuery } from '@/app/api'
+import { CardItem, useGetAllFiltersQuery, useGetAllNodeTypesQuery } from '@/app/api'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/store/store'
 
-const categories = [
-  { name: 'Категория 1', subcategories: ['Подкатегория 1', 'Подкатегория 2', 'Подкатегория 3'] },
-  { name: 'Категория 2', subcategories: ['Подкатегория 1', 'Подкатегория 2'] },
-  { name: 'Категория 3', subcategories: ['Подкатегория 1', 'Подкатегория 2', 'Подкатегория 3'] },
-  { name: 'Категория 4', subcategories: ['Подкатегория 1'] },
-  { name: 'Категория 5', subcategories: ['Подкатегория 1', 'Подкатегория 2'] },
-]
+type SidebarProps = {
+  className?: string
+  onApplyFilters: (filters: string[]) => void
+}
 
-const Sidebar = ({ className }: { className?: string }) => {
+const Sidebar = ({ className, onApplyFilters }: SidebarProps) => {
+  const { data: allFilters } = useGetAllFiltersQuery()
   const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: boolean }>({})
 
   const handleCheckboxChange = (filterKey: string) => {
@@ -40,15 +31,16 @@ const Sidebar = ({ className }: { className?: string }) => {
   const applyFilters = () => {
     const selected = Object.keys(selectedFilters).filter(key => selectedFilters[key])
     console.log('Выбранные фильтры:', selected)
+    onApplyFilters(selected)
   }
 
   return (
     <aside className={`w-[20%] min-h-screen bg-bg-secondary p-4 shadow-md ${className}`}>
       <Accordion type="multiple" className="w-full">
-        {categories.map((category, index) => (
+        {allFilters?.map((filter, index) => (
           <AccordionItem key={index} value={`item-${index}`} className="border-b">
             <AccordionTrigger className=" group flex items-center justify-between w-full text-left py-2 px-4 text-text-primary font-medium hover:text-accent-100">
-              {category.name}
+              {filter.title}
               <ChevronDownIcon
                 className="transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180"
                 aria-hidden
@@ -56,13 +48,13 @@ const Sidebar = ({ className }: { className?: string }) => {
             </AccordionTrigger>
             <AccordionContent className="px-6 pb-2 text-text-primary">
               <ul className="space-y-2">
-                {category.subcategories.map((subcategory, subIndex) => (
+                {filter.values.map((value, subIndex) => (
                   <li key={subIndex} className="flex items-center space-x-2">
                     <Checkbox
-                      checked={selectedFilters[subcategory] || false}
-                      onCheckedChange={() => handleCheckboxChange(subcategory)}
+                      checked={selectedFilters[value] || false}
+                      onCheckedChange={() => handleCheckboxChange(value)}
                     />
-                    <span className="cursor-pointer hover:text-blue-500">{subcategory}</span>
+                    <span className="cursor-pointer hover:text-blue-500">{value}</span>
                   </li>
                 ))}
               </ul>
@@ -90,68 +82,30 @@ const Sidebar = ({ className }: { className?: string }) => {
 
 export const Main = () => {
   const { data: nodeTypes } = useGetAllNodeTypesQuery({ page: 1, size: 10 })
-  const products: ProductItemProps['product'][] = [
-    {
-      image: noImage,
-      price: 100,
-      title: 'Комбинезон 1',
-      description: 'Описание комбинезона 1',
-      rating: { rate: 4.5, count: 10 },
-      id: 1,
-    },
-    {
-      image: noImage,
-      price: 150,
-      title: 'Комбинезон 2',
-      description: 'Описание комбинезона 2',
-      rating: { rate: 4.2, count: 15 },
-      id: 2,
-    },
-    {
-      image: noImage,
-      price: 150,
-      title: 'Комбинезон 2',
-      description: 'Описание комбинезона 2',
-      rating: { rate: 4.2, count: 15 },
-      id: 3,
-    },
-    {
-      image: noImage,
-      price: 150,
-      title: 'Комбинезон 2',
-      description: 'Описание комбинезона 2',
-      rating: { rate: 4.2, count: 15 },
-      id: 4,
-    },
-    {
-      image: noImage,
-      price: 150,
-      title: 'Комбинезон 2',
-      description: 'Описание комбинезона 2',
-      rating: { rate: 4.2, count: 15 },
-      id: 5,
-    },
-    {
-      image: noImage,
-      price: 150,
-      title: 'Комбинезон 2',
-      description: 'Описание комбинезона 2',
-      rating: { rate: 4.2, count: 15 },
-      id: 6,
-    },
-    {
-      image: noImage,
-      price: 150,
-      title: 'Комбинезон 2',
-      description: 'Описание комбинезона 2',
-      rating: { rate: 4.2, count: 15 },
-      id: 7,
-    },
-  ]
+  const cards = useSelector((state: RootState) => state.cards.cards)
+  const [selectedFilters, setSelectedFilters] = useState<string[]>([])
+
+  const handleApplyFilters = (filters: string[]) => {
+    setSelectedFilters(filters)
+  }
+  console.log(cards)
   console.log(nodeTypes)
+
+  const filterCards = (cards: CardItem[], filters: string[]) => {
+    if (filters.length === 0) return cards
+
+    return cards.filter(card => {
+      return card.characteristics.some(characteristicGroup =>
+        characteristicGroup.some(characteristic => filters.includes(characteristic.value))
+      )
+    })
+  }
+
+  const defaultTabValue = nodeTypes?.items[0]?.type || ''
+
   return (
     <div className="flex flex-col w-full">
-      <Tabs onValueChange={value => console.log(value)}>
+      <Tabs defaultValue={defaultTabValue}>
         <div className="w-full bg-border-secondary shadow-md">
           <TabsList className="flex flex-wrap gap-4 py-2 px-4 mx-auto">
             {nodeTypes?.items.map(nodeType => (
@@ -168,15 +122,28 @@ export const Main = () => {
 
         {/* Основной контейнер с сайдбаром и контентом */}
         <div className="flex w-full min-h-screen">
-          <Sidebar />
+          <Sidebar onApplyFilters={handleApplyFilters} />
 
           <div className="w-[80%] p-4">
             {nodeTypes?.items.map(nodeType => (
               <TabsContent key={nodeType.id} value={nodeType.type}>
                 <h2 className="text-2xl font-bold text-center mb-4">{nodeType.type}</h2>
                 <div className="flex flex-wrap justify-center">
-                  {products.map(product => (
-                    <Card key={product.id} product={product} />
+                  {filterCards(
+                    cards.filter(card => card.nodeType === nodeType.type),
+                    selectedFilters
+                  ).map(card => (
+                    <Card
+                      key={card.nodeId}
+                      product={{
+                        image: card.images[0] || noImage,
+                        price: 100,
+                        title: card.title,
+                        description: card.nodeDescription || '',
+                        rating: { rate: 4.5, count: 10 },
+                        id: card.nodeId,
+                      }}
+                    />
                   ))}
                 </div>
               </TabsContent>
