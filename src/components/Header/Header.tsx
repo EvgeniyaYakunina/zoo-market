@@ -12,6 +12,7 @@ export const Header = () => {
   const { width } = useWindowResize()
   const [value, setValue] = useState<string>('')
   const [carts, setCarts] = useState<CartItem[]>([])
+  // const [searchResults, setSearchResults] = useState<CardItem[]>([])
 
   const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
 
@@ -40,7 +41,13 @@ export const Header = () => {
                 {'ZooMarket'}
               </div>
             </div>
-            <Search placeholder="Найти" value={value} setValue={() => setValue} />
+            <Search
+              placeholder="Найти"
+              value={value}
+              setValue={setValue}
+              // onSearch={results => setSearchResults(results)}
+              onSearch={() => {}}
+            />
             {width && width >= 900 && <SignUpAndBasket carts={carts} />}
           </div>
         </div>
