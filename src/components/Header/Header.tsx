@@ -6,15 +6,17 @@ import { IoPerson } from 'react-icons/io5'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { useWindowResize } from '@/hooks'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/store/store'
 
 export const Header = () => {
   const router = useRouter()
   const { width } = useWindowResize()
   const [value, setValue] = useState<string>('')
   const [carts, setCarts] = useState<CartItem[]>([])
-
+  const cards = useSelector((state: RootState) => state.cards.cards)
   const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
-
+  console.log(cards)
   useEffect(() => {
     const updateCart = () => {
       const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')

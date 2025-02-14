@@ -5,6 +5,7 @@ import { Button } from '../ui'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { CartItem } from '@/components'
+import { noImage } from '@/assets'
 
 //TODO: maybe change
 export type ProductItemProps = {
@@ -64,11 +65,12 @@ export const Card = ({ product }: ProductItemProps) => {
           {/* Изображение товара */}
           <div className="relative group">
             <Image
-              src={image}
+              src={image || noImage}
               alt="product"
               width={200}
               height={200}
               className="w-full h-60 object-contain bg-bg-secondary"
+              unoptimized
             />
             <span className="absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-accent-100 text-white text-sm px-4 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity">
               Быстрый просмотр
