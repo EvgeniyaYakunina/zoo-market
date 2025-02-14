@@ -13,6 +13,7 @@ type SearchProps = {
 export const Search = ({ placeholder, value, setValue, keyDown, onSearch }: SearchProps) => {
   const [searchCards] = useSearchCardsMutation()
   const debouncedSearchTerm = useDebounce(value, 300)
+
   useEffect(() => {
     if (debouncedSearchTerm) {
       searchCards({ text: debouncedSearchTerm, limit: 10 })
@@ -28,6 +29,7 @@ export const Search = ({ placeholder, value, setValue, keyDown, onSearch }: Sear
     }
     console.log(searchCards)
   }, [debouncedSearchTerm, searchCards, onSearch])
+
   return (
     <div className="w-full">
       <input

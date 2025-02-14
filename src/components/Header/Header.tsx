@@ -8,16 +8,16 @@ import { ROUTES } from '@/utils/routes'
 import { useWindowResize } from '@/hooks'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/app/store/store'
+import { CardItem } from '@/app/api'
 
-export const Header = () => {
+export const Header = ({ onSearchResults }: { onSearchResults: (results: CardItem[]) => void }) => {
   const router = useRouter()
   const { width } = useWindowResize()
   const [value, setValue] = useState<string>('')
   const [carts, setCarts] = useState<CartItem[]>([])
   const cards = useSelector((state: RootState) => state.cards.cards)
-  // const [searchResults, setSearchResults] = useState<CardItem[]>([])
-
   const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
+
   console.log(cards)
   useEffect(() => {
     const updateCart = () => {
@@ -48,8 +48,7 @@ export const Header = () => {
               placeholder="Найти"
               value={value}
               setValue={setValue}
-              // onSearch={results => setSearchResults(results)}
-              onSearch={() => {}}
+              onSearch={results => onSearchResults(results)}
             />
             {width && width >= 900 && <SignUpAndBasket carts={carts} />}
           </div>
