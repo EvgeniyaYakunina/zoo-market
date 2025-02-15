@@ -6,15 +6,18 @@ import { IoPerson } from 'react-icons/io5'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { useWindowResize } from '@/hooks'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { RootState } from '@/app/store/store'
 import { CardItem } from '@/app/api'
+import { setSearchResults } from '@/app/store/slices/searchSlice'
 
-export const Header = ({ onSearchResults }: { onSearchResults: (results: CardItem[]) => void }) => {
+export const Header = () => {
   const router = useRouter()
+  const dispatch = useDispatch()
   const { width } = useWindowResize()
   const [value, setValue] = useState<string>('')
   const [carts, setCarts] = useState<CartItem[]>([])
+
   const cards = useSelector((state: RootState) => state.cards.cards)
   const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
 
@@ -31,6 +34,9 @@ export const Header = ({ onSearchResults }: { onSearchResults: (results: CardIte
     return () => window.removeEventListener('cartUpdated', updateCart)
   }, [])
 
+  const handleSearchResults = (results: CardItem[]) => {
+    dispatch(setSearchResults(results))
+  }
   return (
     <>
       <header className="fixed w-full z-20 top-0 p-4 bg-accent-100">
@@ -48,7 +54,7 @@ export const Header = ({ onSearchResults }: { onSearchResults: (results: CardIte
               placeholder="Найти"
               value={value}
               setValue={setValue}
-              onSearch={results => onSearchResults(results)}
+              onSearch={handleSearchResults}
             />
             {width && width >= 900 && <SignUpAndBasket carts={carts} />}
           </div>

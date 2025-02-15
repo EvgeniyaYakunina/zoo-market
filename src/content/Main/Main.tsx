@@ -5,7 +5,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@radix-ui/react-accordion'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { noImage } from '@/assets'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
 import { CardItem, useGetAllFiltersQuery, useGetAllNodeTypesQuery } from '@/app/api'
@@ -83,13 +83,13 @@ const Sidebar = ({ className, onApplyFilters }: SidebarProps) => {
 export const Main = () => {
   const { data: nodeTypes } = useGetAllNodeTypesQuery({ page: 1, size: 10 })
   const cards = useSelector((state: RootState) => state.cards.cards)
+  const searchResults = useSelector((state: RootState) => state.search.results)
   const [selectedFilters, setSelectedFilters] = useState<string[]>([])
+  const [defaultTabValue, setDefaultTabValue] = useState<string>('')
 
   const handleApplyFilters = (filters: string[]) => {
     setSelectedFilters(filters)
   }
-  console.log(cards)
-  console.log(nodeTypes)
 
   const filterCards = (cards: CardItem[], filters: string[]) => {
     if (filters.length === 0) return cards
@@ -101,56 +101,64 @@ export const Main = () => {
     })
   }
 
-  const defaultTabValue = nodeTypes?.items[0]?.type || ''
+  useEffect(() => {
+    if (nodeTypes && nodeTypes.items && nodeTypes.items.length > 0) {
+      setDefaultTabValue(nodeTypes.items[0].type)
+    }
+  }, [nodeTypes])
 
   return (
     <div className="flex flex-col w-full">
-      <Tabs defaultValue={defaultTabValue}>
-        <div className="w-full bg-border-secondary shadow-md">
-          <TabsList className="flex flex-wrap gap-4 py-2 px-4 mx-auto">
-            {nodeTypes?.items.map(nodeType => (
-              <TabsTrigger
-                key={nodeType.id}
-                value={nodeType.type}
-                className="text-white text-xl font-bold hover:text-accent-100 whitespace-nowrap"
-              >
-                {nodeType.type}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
-
-        {/* Основной контейнер с сайдбаром и контентом */}
-        <div className="flex w-full min-h-screen">
-          <Sidebar onApplyFilters={handleApplyFilters} />
-
-          <div className="w-[80%] p-4">
-            {nodeTypes?.items.map(nodeType => (
-              <TabsContent key={nodeType.id} value={nodeType.type}>
-                <h2 className="text-2xl font-bold text-center mb-4">{nodeType.type}</h2>
-                <div className="flex flex-wrap justify-center">
-                  {filterCards(
-                    cards.filter(card => card.nodeType === nodeType.type),
-                    selectedFilters
-                  ).map(card => (
-                    <Card
-                      key={card.nodeId}
-                      product={{
-                        image: card.images[0] || noImage,
-                        price: 100,
-                        title: card.title,
-                        description: card.nodeDescription || '',
-                        rating: { rate: 4.5, count: 10 },
-                        id: card.nodeId,
-                      }}
-                    />
-                  ))}
-                </div>
-              </TabsContent>
-            ))}
+      {defaultTabValue && (
+        <Tabs defaultValue={defaultTabValue}>
+          <div className="w-full bg-border-secondary shadow-md">
+            <TabsList className="flex flex-wrap gap-4 py-2 px-4 mx-auto">
+              {nodeTypes?.items.map(nodeType => (
+                <TabsTrigger
+                  key={nodeType.id}
+                  value={nodeType.type}
+                  className="text-white text-xl font-bold hover:text-accent-100 whitespace-nowrap"
+                >
+                  {nodeType.type}
+                </TabsTrigger>
+              ))}
+            </TabsList>
           </div>
-        </div>
-      </Tabs>
+
+          {/* Основной контейнер с сайдбаром и контентом */}
+          <div className="flex w-full min-h-screen">
+            <Sidebar onApplyFilters={handleApplyFilters} />
+
+            <div className="w-[80%] p-4">
+              {nodeTypes?.items.map(nodeType => (
+                <TabsContent key={nodeType.id} value={nodeType.type}>
+                  <h2 className="text-2xl font-bold text-center mb-4">{nodeType.type}</h2>
+                  <div className="flex flex-wrap justify-center">
+                    {filterCards(
+                      searchResults.length > 0 // Если есть результаты поиска, используем их
+                        ? searchResults
+                        : cards.filter(card => card.nodeType === nodeType.type),
+                      selectedFilters
+                    ).map(card => (
+                      <Card
+                        key={card.nodeId}
+                        product={{
+                          image: card.images[0] || noImage,
+                          price: 100,
+                          title: card.title,
+                          description: card.nodeDescription || '',
+                          rating: { rate: 4.5, count: 10 },
+                          id: card.nodeId,
+                        }}
+                      />
+                    ))}
+                  </div>
+                </TabsContent>
+              ))}
+            </div>
+          </div>
+        </Tabs>
+      )}
     </div>
   )
 }

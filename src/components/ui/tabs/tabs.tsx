@@ -1,7 +1,9 @@
 import * as TabsRadix from '@radix-ui/react-tabs'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
 
-type TabsProps = ComponentPropsWithoutRef<typeof TabsRadix.Root>
+type TabsProps = ComponentPropsWithoutRef<typeof TabsRadix.Root> & {
+  defaultValue?: string
+}
 
 /* Tabs component that serves as a container for tabbed navigation.
  * Wraps Radix UI's TabsRoot component.
@@ -18,11 +20,12 @@ type TabsProps = ComponentPropsWithoutRef<typeof TabsRadix.Root>
  */
 
 export const Tabs = forwardRef<ElementRef<typeof TabsRadix.Root>, TabsProps>(
-  ({ onValueChange, children, className, ...rest }, ref) => {
+  ({ onValueChange, children, className, defaultValue, ...rest }, ref) => {
     return (
       <TabsRadix.Root
         className={`w-full ${className}`}
         onValueChange={onValueChange}
+        defaultValue={defaultValue}
         ref={ref}
         {...rest}
       >

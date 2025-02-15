@@ -12,7 +12,7 @@ type SearchProps = {
 
 export const Search = ({ placeholder, value, setValue, keyDown, onSearch }: SearchProps) => {
   const [searchCards] = useSearchCardsMutation()
-  const debouncedSearchTerm = useDebounce(value, 300)
+  const debouncedSearchTerm = useDebounce(value, 600)
 
   useEffect(() => {
     if (debouncedSearchTerm) {
@@ -27,7 +27,6 @@ export const Search = ({ placeholder, value, setValue, keyDown, onSearch }: Sear
     } else {
       onSearch([])
     }
-    console.log(searchCards)
   }, [debouncedSearchTerm, searchCards, onSearch])
 
   return (

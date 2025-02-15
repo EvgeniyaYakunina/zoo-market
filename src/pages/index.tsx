@@ -13,6 +13,7 @@ export default function Home() {
       dispatch(setCards(data))
     }
   }, [data, dispatch])
+
   return (
     <div>
       <Main />
