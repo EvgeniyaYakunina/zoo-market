@@ -1,11 +1,35 @@
+import { CardItem, useSearchCardsMutation } from '@/app/api'
+import { useDebounce } from '@/hooks'
+import { useEffect } from 'react'
+import { SEARCH_DELAY } from '@/utils'
+
 type SearchProps = {
   placeholder: string
   value: string
   setValue: (value: string) => void
   keyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void
+  onSearch: (results: CardItem[]) => void
 }
 
-export const Search = ({ placeholder, value, setValue, keyDown }: SearchProps) => {
+export const Search = ({ placeholder, value, setValue, keyDown, onSearch }: SearchProps) => {
+  const [searchCards] = useSearchCardsMutation()
+  const debouncedSearchTerm = useDebounce(value, SEARCH_DELAY)
+
+  useEffect(() => {
+    if (debouncedSearchTerm) {
+      searchCards({ text: debouncedSearchTerm, limit: 10 })
+        .unwrap()
+        .then(results => {
+          onSearch(results)
+        })
+        .catch(error => {
+          console.error('Ошибка при поиске:', error)
+        })
+    } else {
+      onSearch([])
+    }
+  }, [debouncedSearchTerm, searchCards, onSearch])
+
   return (
     <div className="w-full">
       <input

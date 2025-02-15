@@ -6,17 +6,19 @@ import { IoPerson } from 'react-icons/io5'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { useWindowResize } from '@/hooks'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/app/store/store'
+import { useDispatch } from 'react-redux'
+import { setSearchResults } from '@/app/store'
+import { CardItem } from '@/app/api'
 
 export const Header = () => {
   const router = useRouter()
+  const dispatch = useDispatch()
   const { width } = useWindowResize()
   const [value, setValue] = useState<string>('')
   const [carts, setCarts] = useState<CartItem[]>([])
-  const cards = useSelector((state: RootState) => state.cards.cards)
+
   const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
-  console.log(cards)
+
   useEffect(() => {
     const updateCart = () => {
       const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
@@ -29,6 +31,9 @@ export const Header = () => {
     return () => window.removeEventListener('cartUpdated', updateCart)
   }, [])
 
+  const handleSearchResults = (results: CardItem[]) => {
+    dispatch(setSearchResults(results))
+  }
   return (
     <>
       <header className="fixed w-full z-20 top-0 p-4 bg-accent-100">
@@ -36,13 +41,18 @@ export const Header = () => {
           <div className="flex items-center mt-2">
             <div className="mr-4">
               <div
-                className="text-white text-4xl font-semibold"
+                className="text-white text-4xl font-semibold cursor-pointer"
                 onClick={() => router.push(ROUTES.HOME)}
               >
                 {'ZooMarket'}
               </div>
             </div>
-            <Search placeholder="Найти" value={value} setValue={() => setValue} />
+            <Search
+              placeholder="Найти"
+              value={value}
+              setValue={setValue}
+              onSearch={handleSearchResults}
+            />
             {width && width >= 900 && <SignUpAndBasket carts={carts} />}
           </div>
         </div>
