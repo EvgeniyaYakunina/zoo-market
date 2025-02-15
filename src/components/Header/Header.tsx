@@ -6,10 +6,9 @@ import { IoPerson } from 'react-icons/io5'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { useWindowResize } from '@/hooks'
-import { useDispatch, useSelector } from 'react-redux'
-import { RootState } from '@/app/store/store'
+import { useDispatch } from 'react-redux'
+import { setSearchResults } from '@/app/store'
 import { CardItem } from '@/app/api'
-import { setSearchResults } from '@/app/store/slices/searchSlice'
 
 export const Header = () => {
   const router = useRouter()
@@ -18,10 +17,8 @@ export const Header = () => {
   const [value, setValue] = useState<string>('')
   const [carts, setCarts] = useState<CartItem[]>([])
 
-  const cards = useSelector((state: RootState) => state.cards.cards)
   const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
 
-  console.log(cards)
   useEffect(() => {
     const updateCart = () => {
       const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
@@ -44,7 +41,7 @@ export const Header = () => {
           <div className="flex items-center mt-2">
             <div className="mr-4">
               <div
-                className="text-white text-4xl font-semibold"
+                className="text-white text-4xl font-semibold cursor-pointer"
                 onClick={() => router.push(ROUTES.HOME)}
               >
                 {'ZooMarket'}

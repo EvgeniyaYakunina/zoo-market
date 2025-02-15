@@ -60,7 +60,7 @@ export const Card = ({ product }: ProductItemProps) => {
 
   return (
     <div className="w-[250px] p-4">
-      <div className="shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105">
+      <div className="shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105 cursor-pointer">
         <div onClick={handleClickCard} className="block text-inherit ">
           {/* Изображение товара */}
           <div className="relative group">

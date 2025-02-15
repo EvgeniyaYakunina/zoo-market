@@ -1,6 +1,7 @@
 import { CardItem, useSearchCardsMutation } from '@/app/api'
 import { useDebounce } from '@/hooks'
 import { useEffect } from 'react'
+import { SEARCH_DELAY } from '@/utils'
 
 type SearchProps = {
   placeholder: string
@@ -12,7 +13,7 @@ type SearchProps = {
 
 export const Search = ({ placeholder, value, setValue, keyDown, onSearch }: SearchProps) => {
   const [searchCards] = useSearchCardsMutation()
-  const debouncedSearchTerm = useDebounce(value, 600)
+  const debouncedSearchTerm = useDebounce(value, SEARCH_DELAY)
 
   useEffect(() => {
     if (debouncedSearchTerm) {

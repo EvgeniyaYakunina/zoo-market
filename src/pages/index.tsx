@@ -2,7 +2,7 @@ import { Main } from '@/content'
 import { useDispatch } from 'react-redux'
 import { useGetAllCardsQuery } from '@/app/api'
 import { useEffect } from 'react'
-import { setCards } from '@/app/store/slices/cardsSlice'
+import { setCards } from '@/app/store'
 
 export default function Home() {
   const dispatch = useDispatch()

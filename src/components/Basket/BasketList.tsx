@@ -63,7 +63,7 @@ function BasketItem({ cart, setCarts }: CartProps) {
   return (
     <div className="flex justify-between mt-4">
       <div className="flex justify-between w-full max-w-full lg:max-w-[calc(100%-195px)]">
-        <div className="flex max-w-[560px] w-full">
+        <div className="flex max-w-[560px] w-full cursor-pointer">
           <div>
             {image ? (
               <Image src={image} alt={title} width={96} height={128} className="rounded-2xl mr-5" />
