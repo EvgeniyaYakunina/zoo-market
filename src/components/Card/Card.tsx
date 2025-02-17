@@ -1,11 +1,10 @@
 import Image, { StaticImageData } from 'next/image'
-import { useEffect, useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
 import { Button } from '../ui'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
-import { CartItem } from '@/components'
 import { noImage } from '@/assets'
+import { useCart } from '@/hooks'
 
 //TODO: maybe change
 export type ProductItemProps = {
@@ -14,7 +13,7 @@ export type ProductItemProps = {
     price: number
     title: string
     description: string
-    rating: {
+    rating?: {
       rate: number
       count: number
     }
@@ -22,40 +21,13 @@ export type ProductItemProps = {
   }
 }
 export const Card = ({ product }: ProductItemProps) => {
-  const { image, price, title, description } = product
+  const { image, price, title, description, id } = product
   const roundPrice = Math.floor(price)
   const router = useRouter()
-  const [isInCart, setIsInCart] = useState(false)
-
-  // Проверяем, есть ли товар в корзине при загрузке
-  useEffect(() => {
-    const cartItems = JSON.parse(localStorage.getItem('cart') || '[]')
-    setIsInCart(cartItems.some((item: CartItem) => item.id === product.id))
-  }, [product.id])
-
-  const addToCart = () => {
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
-    const productToAdd = {
-      id: product.id,
-      image: product.image,
-      price: product.price,
-      title: product.title,
-      description: product.description,
-      rating: product.rating,
-      quantity: 1,
-    }
-
-    if (!storedCart.some((item: CartItem) => item.id === productToAdd.id)) {
-      const updatedCart = [...storedCart, productToAdd]
-      localStorage.setItem('cart', JSON.stringify(updatedCart))
-      setIsInCart(true)
-      window.dispatchEvent(new Event('cartUpdated')) // Обновляем Header
-    }
-  }
+  const { isInCart, addToCart } = useCart(id, { image, price, title, description, id })
 
   const handleClickCard = () => {
-    // router.push(`ROUTES.CARD/${id}`)
-    router.push(ROUTES.CARD)
+    router.push(`${ROUTES.CARD}/${id}`)
   }
 
   return (
@@ -65,7 +37,7 @@ export const Card = ({ product }: ProductItemProps) => {
           {/* Изображение товара */}
           <div className="relative group">
             <Image
-              src={image || noImage}
+              src={image ? image : noImage}
               alt="product"
               width={200}
               height={200}
