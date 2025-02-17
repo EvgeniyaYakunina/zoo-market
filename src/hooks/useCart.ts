@@ -4,10 +4,9 @@ import { StaticImageData } from 'next/image'
 export type CartItem = {
   id: number
   image: string | StaticImageData
-  price?: number
+  price: number
   title: string
-  description?: string
-  rating?: { rate: number; count: number }
+  description: string | null | undefined
   quantity: number
 }
 
@@ -39,3 +38,27 @@ export const useCart = (productId: number, productData?: Omit<CartItem, 'quantit
 
   return { isInCart, addToCart }
 }
+// import {CartItem} from "@/components";
+// import {useEffect, useState} from "react";
+//
+// export const useCart = (productData: CartItem) => {
+//   const [isInCart, setIsInCart] = useState(false)
+//
+//   useEffect(() => {
+//     const cartItems: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]')
+//     setIsInCart(cartItems.some(item => item.id === productData.id))
+//   }, [productData.id])
+//
+//   const addToCart = () => {
+//     const storedCart: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]')
+//
+//     if (!storedCart.some(item => item.id === productData.id)) {
+//       const updatedCart = [...storedCart, { ...productData, quantity: 1 }]
+//       localStorage.setItem('cart', JSON.stringify(updatedCart))
+//       setIsInCart(true)
+//       window.dispatchEvent(new Event('cartUpdated'))
+//     }
+//   }
+//
+//   return { isInCart, addToCart }
+// }

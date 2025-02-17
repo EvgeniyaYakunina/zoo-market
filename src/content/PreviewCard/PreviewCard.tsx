@@ -1,23 +1,20 @@
 import { noImage } from '@/assets'
 import { Button } from '@/components'
-import Image, { StaticImageData } from 'next/image'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { FaArrowLeft, FaLongArrowAltDown } from 'react-icons/fa'
 import { useRouter } from 'next/router'
 import { useGetCardByIdQuery } from '@/app/api'
 import { BsCart2 } from 'react-icons/bs'
+import { useCart } from '@/hooks'
 
-type PreviewCardProps = {
-  addToCart: () => void
-  isInCart: boolean
-}
-export const PreviewCard = ({ addToCart, isInCart }: PreviewCardProps) => {
+export const PreviewCard = () => {
   const router = useRouter()
   const { id } = router.query
   const { data: card } = useGetCardByIdQuery(Number(id), { skip: !id })
   const [selectedFlavor, setSelectedFlavor] = useState(0)
-  const [selectedImage, setSelectedImage] = useState<string | StaticImageData>(noImage)
+  const [selectedImage, setSelectedImage] = useState(card?.images?.[0] || noImage)
 
   useEffect(() => {
     if (card?.images?.length) {
@@ -25,6 +22,15 @@ export const PreviewCard = ({ addToCart, isInCart }: PreviewCardProps) => {
     }
   }, [card?.images])
 
+  const productData = {
+    id: Number(id),
+    image: selectedImage || noImage,
+    price: 250,
+    title: card?.title || 'Название товара',
+    description: card?.description,
+  }
+
+  const { isInCart, addToCart } = useCart(Number(id), productData)
   const flavors = ['Курица', 'Говядина', 'Рыба', 'Индейка', 'Утка', 'Лосось']
   return (
     <div className="px-10 py-6 flex justify-center w-full">
