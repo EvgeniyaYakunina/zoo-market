@@ -38,27 +38,3 @@ export const useCart = (productId: number, productData?: Omit<CartItem, 'quantit
 
   return { isInCart, addToCart }
 }
-// import {CartItem} from "@/components";
-// import {useEffect, useState} from "react";
-//
-// export const useCart = (productData: CartItem) => {
-//   const [isInCart, setIsInCart] = useState(false)
-//
-//   useEffect(() => {
-//     const cartItems: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]')
-//     setIsInCart(cartItems.some(item => item.id === productData.id))
-//   }, [productData.id])
-//
-//   const addToCart = () => {
-//     const storedCart: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]')
-//
-//     if (!storedCart.some(item => item.id === productData.id)) {
-//       const updatedCart = [...storedCart, { ...productData, quantity: 1 }]
-//       localStorage.setItem('cart', JSON.stringify(updatedCart))
-//       setIsInCart(true)
-//       window.dispatchEvent(new Event('cartUpdated'))
-//     }
-//   }
-//
-//   return { isInCart, addToCart }
-// }
