@@ -1,5 +1,5 @@
 import { noImage } from '@/assets'
-import { Button } from '@/components'
+import { Button, Loader } from '@/components'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -7,31 +7,47 @@ import { FaArrowLeft, FaLongArrowAltDown } from 'react-icons/fa'
 import { useRouter } from 'next/router'
 import { useGetCardByIdQuery } from '@/app/api'
 import { BsCart2 } from 'react-icons/bs'
-import { useCart } from '@/hooks'
+import { useCart, useErrorHandler } from '@/hooks'
 
 export const PreviewCard = () => {
   const router = useRouter()
   const { id } = router.query
-  const { data: card } = useGetCardByIdQuery(Number(id), { skip: !id })
+  const handleError = useErrorHandler()
+  const {
+    data: cardInfo,
+    isLoading: isCardLoading,
+    error: cardError,
+  } = useGetCardByIdQuery(Number(id), {
+    skip: !id,
+    refetchOnMountOrArgChange: true,
+  })
   const [selectedFlavor, setSelectedFlavor] = useState(0)
-  const [selectedImage, setSelectedImage] = useState(card?.images?.[0] || noImage)
-
+  const [selectedImage, setSelectedImage] = useState(cardInfo?.images?.[0] || noImage)
   useEffect(() => {
-    if (card?.images?.length) {
-      setSelectedImage(card.images[0])
+    if (cardError) {
+      handleError(cardError)
     }
-  }, [card?.images])
+  }, [cardError])
+  useEffect(() => {
+    if (cardInfo?.images?.length) {
+      setSelectedImage(cardInfo.images[0])
+    }
+  }, [cardInfo?.images])
 
   const productData = {
     id: Number(id),
     image: selectedImage || noImage,
     price: 250,
-    title: card?.title || 'Название товара',
-    description: card?.description,
+    title: cardInfo?.title || 'Название товара',
+    description: cardInfo?.description,
   }
 
   const { isInCart, addToCart } = useCart(Number(id), productData)
   const flavors = ['Курица', 'Говядина', 'Рыба', 'Индейка', 'Утка', 'Лосось']
+
+  if (isCardLoading) {
+    return <Loader />
+  }
   return (
     <div className="px-10 py-6 flex justify-center w-full">
       <div className="w-full max-w-[1400px] flex items-start gap-8">
@@ -44,9 +60,9 @@ export const PreviewCard = () => {
             <FaArrowLeft className="text-xl" />
             <span>Назад</span>
           </Link>
-          {card?.images ? (
-            card.images.length > 0 &&
-            card.images.map((image, idx) => (
+          {cardInfo?.images ? (
+            cardInfo.images.length > 0 &&
+            cardInfo.images.map((image, idx) => (
               <div
                 key={idx}
                 className={`w-16 h-24 bg-bg-secondary shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105 cursor-pointer ${
@@ -80,7 +96,7 @@ export const PreviewCard = () => {
         {/* Правая колонка с описанием */}
         <div className="flex flex-col w-auto">
           {/* Заголовок */}
-          <h1 className="text-2xl font-semibold text-text-primary mb-1">{card?.title}</h1>
+          <h1 className="text-2xl font-semibold text-text-primary mb-1">{cardInfo?.title}</h1>
           {/* Варианты вкусов */}
           <div className="mt-5">
             <h3 className="mb-2 text-text-secondary">Вариант: {flavors[selectedFlavor]}</h3>
@@ -106,11 +122,11 @@ export const PreviewCard = () => {
           </div>
           {/* Характеристики */}
           <div className="mt-5 flex text-lg">
-            {card?.characteristics && card.characteristics.length > 0 && (
+            {cardInfo?.characteristics && cardInfo.characteristics.length > 0 && (
               <div className="mt-5">
                 <h3 className="mb-2 text-text-secondary">Характеристики:</h3>
                 <ul className="text-text-primary space-y-2">
-                  {card.characteristics.flat().map((char, index) => (
+                  {cardInfo.characteristics.flat().map((char, index) => (
                     <li key={index} className="p-2 border border-bg-secondary rounded-md">
                       <strong className="text-text-primary">{char.title}:</strong> {char.value}
                       {char.description && (
