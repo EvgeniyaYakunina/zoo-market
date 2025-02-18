@@ -1,10 +1,15 @@
 //types for characteristics
 
+export type Optional<T> = T | null | undefined
+export type PromiseOptional<T> = Promise<T | null | undefined>
+export type PromiseNull<T> = Promise<T | null>
+export type Nullable<T> = T | null
+
 // Определение типа для отдельной характеристики
 export type Characteristic = {
   id: number
   title: string
-  description: string | null
+  description: Nullable<string>
   isVisible: boolean
 }
 
@@ -20,7 +25,7 @@ export type CharacteristicsResponse = {
 // Тип для запроса создания характеристики
 export type CreateCharacteristicRequest = {
   title: string
-  description: string | null
+  description: Nullable<string>
 }
 
 // Тип для запроса обновления характеристики
@@ -28,7 +33,7 @@ export type CreateCharacteristicRequest = {
 export type UpdateCharacteristicRequest = {
   id: number
   title: string
-  description: string | null
+  description: Nullable<string>
   isVisible: boolean
 }
 export type UpdateCharacteristicResponse = {
@@ -72,7 +77,7 @@ export type CharacteristicDefaultValuesResponse = {
 export type NodeType = {
   id: number
   type: string
-  description: string | null
+  description: Nullable<string>
 }
 
 // Тип для ответа с пагинацией
@@ -91,10 +96,10 @@ export type Node = {
   id: number
   title: string
   nodeTypeId: number
-  description: string | null
+  description: Nullable<string>
   createdAt: string
   updatedAt: string
-  removedAt: string | null
+  removedAt: Nullable<string>
 }
 
 // type для ответа с пагинацией
@@ -111,7 +116,7 @@ export type NodesResponse = {
 // Тип для тела запроса
 export type CreateCardRequest = {
   title: string
-  nodeDescription: string | null
+  nodeDescription: Nullable<string>
   nodeTypeId: number
   images: string[]
   characteristics: Array<{
@@ -126,7 +131,7 @@ export type CharacteristicResponse = {
   title: string
   value: string
   additionalParams: Record<string, unknown> | null
-  description: string | null
+  description: Nullable<string>
 }
 
 // Тип для ответа
@@ -134,13 +139,13 @@ export type CreateCardResponse = {
   id: {
     nodeId: number
     title: string
-    nodeDescription: string | null
+    nodeDescription: Nullable<string>
     createdAt: string
     updatedAt: string
-    removedAt: string | null
+    removedAt: Nullable<string>
     images: string[]
     nodeType: string
-    nodeTypeDescription: string | null
+    nodeTypeDescription: Nullable<string>
     characteristics: CharacteristicResponse[][]
   }
 }
@@ -148,17 +153,17 @@ export type CreateCardResponse = {
 export type CardDetails = Omit<Node, 'nodeTypeId'> & {
   images: string[]
   nodeType: string
-  nodeTypeDescription: string | null
+  nodeTypeDescription: Nullable<string>
   characteristics: CharacteristicResponse[][]
 }
 
 // Новый тип для отдельной карточки в ответе getAllCards
 export type CardItem = Omit<Node, 'id' | 'nodeTypeId' | 'description'> & {
   nodeId: number
-  nodeDescription: string | null
+  nodeDescription: Nullable<string>
   images: string[]
   nodeType: string
-  nodeTypeDescription: string | null
+  nodeTypeDescription: Nullable<string>
   characteristics: CharacteristicResponse[][]
 }
 
