@@ -1,16 +1,26 @@
-import { Button, Card, Checkbox, Tabs, TabsContent, TabsList, TabsTrigger } from '@/components'
+import { CardItem, useGetAllFiltersQuery, useGetAllNodeTypesQuery } from '@/app/api'
+import { RootState } from '@/app/store/store'
+import { noImage } from '@/assets'
+import {
+  Button,
+  Card,
+  Checkbox,
+  Loader,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components'
+import { useErrorHandler } from '@/hooks'
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from '@radix-ui/react-accordion'
-import { useEffect, useState } from 'react'
-import { noImage } from '@/assets'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
-import { CardItem, useGetAllFiltersQuery, useGetAllNodeTypesQuery } from '@/app/api'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/app/store/store'
 
 type SidebarProps = {
   className?: string
@@ -18,8 +28,19 @@ type SidebarProps = {
 }
 
 const Sidebar = ({ className, onApplyFilters }: SidebarProps) => {
-  const { data: allFilters } = useGetAllFiltersQuery()
+  const {
+    data: allFilters,
+    error: filterError,
+    isLoading: isLoadingFilters,
+  } = useGetAllFiltersQuery()
   const [selectedFilters, setSelectedFilters] = useState<{ [key: string]: boolean }>({})
+  const handleError = useErrorHandler()
+
+  useEffect(() => {
+    if (filterError) {
+      handleError(filterError)
+    }
+  }, [filterError])
 
   const handleCheckboxChange = (filterKey: string) => {
     setSelectedFilters(prev => ({
@@ -33,7 +54,8 @@ const Sidebar = ({ className, onApplyFilters }: SidebarProps) => {
     console.log('Выбранные фильтры:', selected)
     onApplyFilters(selected)
   }
-
+  // TODO: add loader
+  if (isLoadingFilters) return <Loader />
   return (
     <aside className={`w-[20%] min-h-screen bg-bg-secondary p-4 shadow-md ${className}`}>
       <Accordion type="multiple" className="w-full">
@@ -81,7 +103,12 @@ const Sidebar = ({ className, onApplyFilters }: SidebarProps) => {
 }
 
 export const Main = () => {
-  const { data: nodeTypes } = useGetAllNodeTypesQuery({ page: 1, size: 10 })
+  const {
+    data: nodeTypes,
+    isLoading: isLoadingNodeTypes,
+    error: nodeTypesError,
+  } = useGetAllNodeTypesQuery({ page: 1, size: 10 })
+  const handleError = useErrorHandler()
   const cards = useSelector((state: RootState) => state.cards.cards)
   const searchResults = useSelector((state: RootState) => state.search.results)
   const [selectedFilters, setSelectedFilters] = useState<string[]>([])
@@ -106,7 +133,13 @@ export const Main = () => {
       setDefaultTabValue(nodeTypes.items[0].type)
     }
   }, [nodeTypes])
-
+  useEffect(() => {
+    if (nodeTypesError) {
+      handleError(nodeTypesError)
+    }
+  }, [nodeTypesError])
+  // TODO: add loader
+  if (isLoadingNodeTypes) return <Loader />
   return (
     <div className="flex flex-col w-full">
       {defaultTabValue && (

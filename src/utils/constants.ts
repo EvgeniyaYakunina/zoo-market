@@ -1,1 +1,2 @@
 export const SEARCH_DELAY = 600
+export const UPDATE_ALL_CARDS_INTERVAL = 600000
