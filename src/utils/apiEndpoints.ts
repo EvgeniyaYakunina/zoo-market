@@ -2,8 +2,13 @@ export const ApiEndpoints = {
   BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://alekseyfgl-shop-3ca5.twc1.net/api/',
 
   // Characteristics
-  GET_ALL_CHARACTERISTICS: (page: number, size: number) =>
-    `characteristics?page=${page}&size=${size}`,
+  GET_ALL_CHARACTERISTICS: (
+    page: number,
+    size: number,
+    nodeType?: string,
+    characteristic?: string
+  ) =>
+    `characteristics?page=${page}&size=${size}${nodeType ? `&nodeType=${nodeType}` : ''}${characteristic ? `&characteristic=${characteristic}` : ''}`,
   CREATE_CHARACTERISTIC: 'characteristics',
   UPDATE_CHARACTERISTIC: 'characteristics',
   DELETE_CHARACTERISTIC: (id: number) => `characteristics/${id}`,
@@ -32,7 +37,30 @@ export const ApiEndpoints = {
   // Cards
   CREATE_CARD: 'cards',
   GET_CARD_BY_ID: (id: number) => `cards/${id}`,
-  GET_ALL_CARDS: 'cards',
+  GET_ALL_CARDS: ({
+    pageNumber = 1,
+    pageSize = 50,
+    nodeTypeId,
+    filters,
+  }: {
+    pageNumber?: number
+    pageSize?: number
+    nodeTypeId?: number
+    filters?: Record<string, string>
+  } = {}) => {
+    const params: string[] = []
+    if (nodeTypeId !== undefined) {
+      params.push(`nodeTypeId=${nodeTypeId}`)
+    }
+    params.push(`pageNumber=${pageNumber}`)
+    params.push(`pageSize=${pageSize}`)
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        params.push(`${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`)
+      })
+    }
+    return `cards?${params.join('&')}`
+  },
   SEARCH_CARDS: 'cards/search',
 
   // Files

@@ -7,8 +7,8 @@ import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { useWindowResize } from '@/hooks'
 import { useDispatch } from 'react-redux'
-import { setSearchResults } from '@/app/store'
-import { CardItem } from '@/app/api'
+import { setCards, setSearchResults } from '@/app/store'
+import { CardItem, useGetAllCardsQuery } from '@/app/api'
 
 export const Header = () => {
   const router = useRouter()
@@ -16,6 +16,11 @@ export const Header = () => {
   const { width } = useWindowResize()
   const [value, setValue] = useState<string>('')
   const [carts, setCarts] = useState<CartItem[]>([])
+
+  const { data: allCards, refetch } = useGetAllCardsQuery({
+    pageNumber: 1,
+    pageSize: 100,
+  })
 
   const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
 
@@ -34,6 +39,18 @@ export const Header = () => {
   const handleSearchResults = (results: CardItem[]) => {
     dispatch(setSearchResults(results))
   }
+
+  const handleHomeClick = () => {
+    setValue('')
+    router.push(ROUTES.HOME)
+    window.dispatchEvent(new Event('resetFilters'))
+    refetch()
+    if (allCards) {
+      dispatch(setCards(allCards))
+      dispatch(setSearchResults([]))
+    }
+  }
+
   return (
     <>
       <header className="fixed w-full z-20 top-0 p-4 bg-accent-100">
@@ -42,7 +59,7 @@ export const Header = () => {
             <div className="mr-4">
               <div
                 className="text-white text-4xl font-semibold cursor-pointer"
-                onClick={() => router.push(ROUTES.HOME)}
+                onClick={handleHomeClick}
               >
                 {'ZooMarket'}
               </div>
@@ -62,10 +79,7 @@ export const Header = () => {
         <div className="border-t border-gray-300 block bg-white w-full p-4 fixed bottom-0 z-50 shadow-md md:hidden">
           <ul className="flex justify-around">
             <li>
-              <GoHomeFill
-                onClick={() => router.push(ROUTES.HOME)}
-                className={`w-6 h-6 cursor-pointer`}
-              />
+              <GoHomeFill onClick={handleHomeClick} className={`w-6 h-6 cursor-pointer`} />
             </li>
             <li className={'relative'}>
               <BsCart2
