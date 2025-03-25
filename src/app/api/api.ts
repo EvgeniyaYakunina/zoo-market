@@ -52,10 +52,6 @@ export const api = createApi({
   reducerPath: 'api',
   baseQuery: fetchBaseQuery({ baseUrl: ApiEndpoints.BASE_URL }),
   endpoints: builder => ({
-    // Characteristics
-    // getAllCharacteristics: builder.query<CharacteristicsResponse, { page: number; size: number }>({
-    //   query: ({ page, size }) => GET_ALL_CHARACTERISTICS(page, size),
-    // }),
     getAllCharacteristics: builder.query<
       CharacteristicsResponse,
       { page: number; size: number; nodeType?: string; characteristic?: string }

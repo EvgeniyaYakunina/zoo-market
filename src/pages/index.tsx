@@ -14,10 +14,13 @@ export default function Home() {
     data,
     error: allCardsError,
     isLoading: isAllCardsLoading,
-  } = useGetAllCardsQuery(undefined, {
-    pollingInterval: UPDATE_ALL_CARDS_INTERVAL,
-    refetchOnMountOrArgChange: true,
-  })
+  } = useGetAllCardsQuery(
+    {},
+    {
+      pollingInterval: UPDATE_ALL_CARDS_INTERVAL,
+      refetchOnMountOrArgChange: true,
+    }
+  )
 
   useEffect(() => {
     if (data) {
