@@ -7,23 +7,7 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ir-3.ozone.ru',
-      },
-      {
-        protocol: 'https',
-        hostname: 'giperzoo.by',
-      },
-      {
-        protocol: 'https',
-        hostname: 'cs1.livemaster.ru',
-      },
-      {
-        protocol: 'https',
-        hostname: 'img.moyo.ua',
-      },
-      {
-        protocol: 'https',
-        hostname: 'catalog.detmir.st',
+        hostname: '47d9cd7f-3601bf4d-c134-424a-ac90-7d5ef6590a60.s3.timeweb.cloud',
       },
     ],
   },

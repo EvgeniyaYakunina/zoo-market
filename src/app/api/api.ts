@@ -53,9 +53,17 @@ export const api = createApi({
   baseQuery: fetchBaseQuery({ baseUrl: ApiEndpoints.BASE_URL }),
   endpoints: builder => ({
     // Characteristics
-    getAllCharacteristics: builder.query<CharacteristicsResponse, { page: number; size: number }>({
-      query: ({ page, size }) => GET_ALL_CHARACTERISTICS(page, size),
+    // getAllCharacteristics: builder.query<CharacteristicsResponse, { page: number; size: number }>({
+    //   query: ({ page, size }) => GET_ALL_CHARACTERISTICS(page, size),
+    // }),
+    getAllCharacteristics: builder.query<
+      CharacteristicsResponse,
+      { page: number; size: number; nodeType?: string; characteristic?: string }
+    >({
+      query: ({ page, size, nodeType, characteristic }) =>
+        GET_ALL_CHARACTERISTICS(page, size, nodeType, characteristic),
     }),
+
     createCharacteristic: builder.mutation<Characteristic, CreateCharacteristicRequest>({
       query: (body: CreateCharacteristicRequest) => ({
         url: CREATE_CHARACTERISTIC,
@@ -189,9 +197,19 @@ export const api = createApi({
     getCardById: builder.query<CardDetails, number>({
       query: id => GET_CARD_BY_ID(id),
     }),
-    getAllCards: builder.query<AllCardsResponse, void>({
-      query: () => GET_ALL_CARDS,
+
+    getAllCards: builder.query<
+      AllCardsResponse,
+      {
+        pageNumber?: number
+        pageSize?: number
+        nodeTypeId?: number
+        filters?: Record<string, string>
+      }
+    >({
+      query: (args = {}) => GET_ALL_CARDS(args),
     }),
+
     searchCards: builder.mutation<CardItem[], { text: string; limit: number }>({
       query: body => ({
         url: SEARCH_CARDS,
