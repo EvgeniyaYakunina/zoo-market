@@ -22,25 +22,25 @@ import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/app/store'
 
+type Filter = {
+  characteristicId: number
+  title: string
+  values: string[]
+}
+
 type SidebarProps = {
   className?: string
   onApplyFilters: (filters: Record<string, string>) => void
+  filters?: Filter[]
+  isLoading?: boolean
 }
 
-const Sidebar = ({ className, onApplyFilters }: SidebarProps) => {
-  const {
-    data: allFilters,
-    error: filterError,
-    isLoading: isLoadingFilters,
-  } = useGetAllFiltersQuery()
+const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps) => {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({})
-  const handleError = useErrorHandler()
 
   useEffect(() => {
-    if (filterError) {
-      handleError(filterError)
-    }
-  }, [filterError])
+    setSelectedFilters({})
+  }, [filters])
 
   const handleCheckboxChange = (filterTitle: string, value: string) => {
     setSelectedFilters(prev => ({
@@ -57,54 +57,67 @@ const Sidebar = ({ className, onApplyFilters }: SidebarProps) => {
       },
       {} as Record<string, string>
     )
-    console.log('Применяем фильтры:', applied)
     onApplyFilters(applied)
   }
 
-  if (isLoadingFilters) return <Loader />
+  if (isLoading) return <Loader />
+  if (!filters) return null
+
+  console.log('Current filters:', filters)
 
   return (
     <aside className={`w-[20%] min-h-screen bg-bg-secondary p-4 shadow-md ${className}`}>
       <Accordion type="multiple" className="w-full">
-        {allFilters?.map((filter, index) => (
-          <AccordionItem key={index} value={`item-${index}`} className="border-b">
-            <AccordionTrigger className="group flex items-center justify-between w-full text-left py-2 px-4 text-text-primary font-medium hover:text-accent-100">
-              {filter.title}
-              <ChevronDownIcon
-                className="transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180"
-                aria-hidden
-              />
-            </AccordionTrigger>
-            <AccordionContent className="px-6 pb-2 text-text-primary">
-              {filter.title.toLowerCase() === 'скидка' && filter.values.length === 0 ? (
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    checked={selectedFilters['Скидка'] === 'true'}
-                    onCheckedChange={() =>
-                      handleCheckboxChange(
-                        'Скидка',
-                        selectedFilters['Скидка'] === 'true' ? '' : 'true'
-                      )
-                    }
-                  />
-                  <span className="cursor-pointer hover:text-blue-500">Скидка</span>
-                </div>
-              ) : (
-                <ul className="space-y-2">
-                  {filter.values.map((value, subIndex) => (
-                    <li key={subIndex} className="flex items-center space-x-2">
-                      <Checkbox
-                        checked={selectedFilters[filter.title] === value}
-                        onCheckedChange={() => handleCheckboxChange(filter.title, value)}
-                      />
-                      <span className="cursor-pointer hover:text-blue-500">{value}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
+        {filters.map(filter => {
+          console.log(`Rendering filter: ${filter.title}`, filter.values)
+
+          return (
+            <AccordionItem
+              key={filter.characteristicId}
+              value={`item-${filter.characteristicId}`}
+              className="border-b"
+            >
+              <AccordionTrigger className="group flex items-center justify-between w-full text-left py-2 px-4 text-text-primary font-medium hover:text-accent-100">
+                {filter.title}
+                <ChevronDownIcon
+                  className="transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-180"
+                  aria-hidden
+                />
+              </AccordionTrigger>
+              <AccordionContent className="px-6 pb-2 text-text-primary">
+                {filter.title.toLowerCase() === 'скидка' ? (
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      checked={selectedFilters['Скидка'] === 'true'}
+                      onCheckedChange={() =>
+                        handleCheckboxChange(
+                          'Скидка',
+                          selectedFilters['Скидка'] === 'true' ? '' : 'true'
+                        )
+                      }
+                    />
+                    <span className="cursor-pointer hover:text-blue-500">Скидка</span>
+                  </div>
+                ) : (
+                  <ul className="space-y-2">
+                    {filter.values.map((value, index) => (
+                      <li
+                        key={`${filter.characteristicId}-${index}`}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          checked={selectedFilters[filter.title] === value}
+                          onCheckedChange={() => handleCheckboxChange(filter.title, value)}
+                        />
+                        <span className="cursor-pointer hover:text-blue-500">{value}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </AccordionContent>
+            </AccordionItem>
+          )
+        })}
       </Accordion>
 
       <div className="flex mx-8 mt-4 text-white">
@@ -122,9 +135,21 @@ export const Main = () => {
     isLoading: isLoadingNodeTypes,
     error: nodeTypesError,
   } = useGetAllNodeTypesQuery({ page: 1, size: 10 })
+
   const [selectedNodeTypeId, setSelectedNodeTypeId] = useState<number | null>(null)
   const [selectedCharacteristics, setSelectedCharacteristics] = useState<Record<string, string>>({})
   const [filtersApplied, setFiltersApplied] = useState(false)
+
+  // Получаем фильтры с учетом выбранной категории
+  const { data: filters, isLoading: isLoadingFilters } = useGetAllFiltersQuery(
+    selectedNodeTypeId ? { nodeTypeId: selectedNodeTypeId } : {}
+  )
+
+  const handleNodeTypeChange = (nodeTypeId: number) => {
+    setSelectedNodeTypeId(nodeTypeId)
+    setSelectedCharacteristics({})
+    setFiltersApplied(false)
+  }
 
   const handleError = useErrorHandler()
   const searchResults = useSelector((state: RootState) => state.search.results)
@@ -166,7 +191,6 @@ export const Main = () => {
   }
 
   const renderContent = () => {
-    // Если есть ошибка при загрузке карточек
     if (cardsError) {
       return (
         <div className="flex items-center justify-center w-full h-[calc(100vh-200px)] pl-[500px]">
@@ -175,7 +199,6 @@ export const Main = () => {
       )
     }
 
-    // Если есть результаты поиска - показываем их
     if (searchResults && searchResults.length > 0) {
       return (
         <div className="flex flex-wrap justify-center">
@@ -200,10 +223,8 @@ export const Main = () => {
       return <Loader />
     }
 
-    // Если были применены фильтры (характеристики или nodeTypeId)
     const hasFilters = filtersApplied || selectedNodeTypeId !== null
 
-    // Если есть фильтры и нет товаров
     if (hasFilters && (!cardsData?.items || cardsData.items.length === 0)) {
       return (
         <div className="flex items-center justify-center w-full h-[calc(100vh-200px)]">
@@ -212,7 +233,6 @@ export const Main = () => {
       )
     }
 
-    // Если есть товары
     if (cardsData?.items && cardsData.items.length > 0) {
       return (
         <div className="flex flex-wrap justify-center">
@@ -233,10 +253,9 @@ export const Main = () => {
       )
     }
 
-    // Дефолтный случай (без фильтров и без товаров)
     return (
       <div className="flex items-center justify-center pl-[100px] w-full h-[calc(100vh-200px)]">
-        <div className="text-4xl font-semibold text-text-primary ">Товары не найдены</div>
+        <div className="text-4xl font-semibold text-text-primary">Товары не найдены</div>
       </div>
     )
   }
@@ -255,10 +274,7 @@ export const Main = () => {
               <TabsTrigger
                 key={nt.id}
                 value={nt.id.toString()}
-                onClick={() => {
-                  setSelectedNodeTypeId(nt.id)
-                  setFiltersApplied(false)
-                }}
+                onClick={() => handleNodeTypeChange(nt.id)}
                 className="text-white text-xl font-bold hover:text-accent-100 whitespace-nowrap"
               >
                 {nt.type}
@@ -268,7 +284,12 @@ export const Main = () => {
         </div>
 
         <div className="flex w-full min-h-screen">
-          <Sidebar onApplyFilters={handleApplyFilters} />
+          <Sidebar
+            onApplyFilters={handleApplyFilters}
+            filters={filters}
+            isLoading={isLoadingFilters}
+            key={selectedNodeTypeId || 'all'}
+          />
 
           <TabsContent value={selectedNodeTypeId !== null ? selectedNodeTypeId.toString() : 'all'}>
             <div className="flex flex-col w-full p-4">{renderContent()}</div>

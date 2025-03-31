@@ -78,14 +78,20 @@ export const api = createApi({
         body,
       }),
     }),
+
     deleteCharacteristic: builder.mutation<{ id: number }, number>({
       query: id => ({
         url: DELETE_CHARACTERISTIC(id),
         method: 'DELETE',
       }),
     }),
-    getAllFilters: builder.query<AllFiltersResponse, void>({
-      query: () => GET_ALL_FILTERS,
+
+    // В вашем API слое добавьте параметр nodeTypeId к запросу фильтров
+    getAllFilters: builder.query<AllFiltersResponse, { nodeTypeId?: number }>({
+      query: ({ nodeTypeId } = {}) => ({
+        url: GET_ALL_FILTERS,
+        params: nodeTypeId ? { nodeTypeId } : {},
+      }),
     }),
 
     // Characteristic Default Values
