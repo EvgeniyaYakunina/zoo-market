@@ -21,6 +21,7 @@ import { ChevronDownIcon } from '@radix-ui/react-icons'
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/app/store'
+import { UPDATE_ALL_CARDS_INTERVAL } from '@/utils'
 
 type Filter = {
   characteristicId: number
@@ -182,7 +183,7 @@ export const Main = () => {
       nodeTypeId: selectedNodeTypeId !== null ? selectedNodeTypeId : undefined,
       filters: selectedCharacteristics,
     },
-    { refetchOnMountOrArgChange: true }
+    { refetchOnMountOrArgChange: true, pollingInterval: UPDATE_ALL_CARDS_INTERVAL }
   )
 
   const handleApplyFilters = (filters: Record<string, string>) => {

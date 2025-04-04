@@ -8,7 +8,7 @@ import { ROUTES } from '@/utils/routes'
 import { useWindowResize } from '@/hooks'
 import { useDispatch } from 'react-redux'
 import { setCards, setSearchResults } from '@/app/store'
-import { CardItem, useGetAllCardsQuery } from '@/app/api'
+import { CardItem, useLazyGetAllCardsQuery } from '@/app/api'
 
 export const Header = () => {
   const router = useRouter()
@@ -17,10 +17,7 @@ export const Header = () => {
   const [value, setValue] = useState<string>('')
   const [carts, setCarts] = useState<CartItem[]>([])
 
-  const { data: allCards, refetch } = useGetAllCardsQuery({
-    pageNumber: 1,
-    pageSize: 100,
-  })
+  const [fetchAllCards, { data: allCards }] = useLazyGetAllCardsQuery()
 
   const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
 
@@ -40,11 +37,13 @@ export const Header = () => {
     dispatch(setSearchResults(results))
   }
 
-  const handleHomeClick = () => {
+  const handleHomeClick = async () => {
     setValue('')
     router.push(ROUTES.HOME)
     window.dispatchEvent(new Event('resetFilters'))
-    refetch()
+
+    await fetchAllCards({ pageNumber: 1, pageSize: 100 })
+
     if (allCards) {
       dispatch(setCards(allCards))
       dispatch(setSearchResults([]))
