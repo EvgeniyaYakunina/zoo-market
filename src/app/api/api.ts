@@ -260,6 +260,7 @@ export const {
   useCreateCardMutation,
   useGetCardByIdQuery,
   useGetAllCardsQuery,
+  useLazyGetAllCardsQuery,
   useSearchCardsMutation,
   useDeleteFilesByNodeIdMutation,
   useDeleteFileByUuidMutation,
