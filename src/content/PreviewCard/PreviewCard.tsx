@@ -8,6 +8,17 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
 import { FaArrowLeft } from 'react-icons/fa'
+// Import Swiper and modules
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { FreeMode, Navigation, Thumbs, Mousewheel, Keyboard } from 'swiper/modules'
+// Import Swiper styles
+import 'swiper/css'
+import 'swiper/css/free-mode'
+import 'swiper/css/navigation'
+import 'swiper/css/thumbs'
+import 'swiper/css/mousewheel'
+import 'swiper/css/keyboard'
+import type { Swiper as SwiperType } from 'swiper'
 
 export const PreviewCard = () => {
   const router = useRouter()
@@ -23,6 +34,9 @@ export const PreviewCard = () => {
   })
   const [selectedFlavor, setSelectedFlavor] = useState(0)
   const [selectedImage, setSelectedImage] = useState(cardInfo?.images?.[0] || noImage)
+  // For Swiper thumbnails
+  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
+
   useEffect(() => {
     if (cardError) {
       handleError(cardError)
@@ -50,6 +64,8 @@ export const PreviewCard = () => {
   const { isInCart, addToCart } = useCart(Number(id), productData)
   const flavors = ['Курица', 'Говядина', 'Рыба', 'Индейка', 'Утка', 'Лосось']
 
+  const hasMultipleImages = cardInfo?.images && cardInfo.images.length > 1
+
   if (isCardLoading) {
     return <Loader />
   }
@@ -57,7 +73,7 @@ export const PreviewCard = () => {
     <div className="px-10 py-6 flex justify-center w-full">
       <div className="w-full max-w-[1400px] flex items-start gap-8">
         {/* Левая колонка с миниатюрами и кнопкой "Назад" */}
-        <div className="flex flex-col gap-4 ">
+        <div className="flex flex-col gap-4 h-[500px]">
           <Link
             href="/"
             className="flex items-center gap-2 text-text-primary hover:text-text-secondary mb-4"
@@ -65,38 +81,85 @@ export const PreviewCard = () => {
             <FaArrowLeft className="text-xl" />
             <span>Назад</span>
           </Link>
-          {cardInfo?.images ? (
-            cardInfo.images.length > 0 &&
-            cardInfo.images.map((image, idx) => (
-              <div
-                key={idx}
-                className={`w-16 h-24 bg-bg-secondary shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105 cursor-pointer ${
-                  selectedImage === image ? 'ring-2 ring-accent-100' : ''
-                }`}
-                onClick={() => setSelectedImage(image)}
-              >
-                <Image
-                  src={image || noImage}
-                  alt={`Thumbnail ${idx + 1}`}
-                  width={64}
-                  height={96}
-                  className="object-cover"
-                />
-              </div>
-            ))
+          {hasMultipleImages ? (
+            <Swiper
+              onSwiper={setThumbsSwiper}
+              direction="vertical"
+              spaceBetween={10}
+              slidesPerView={4}
+              freeMode={true}
+              watchSlidesProgress={true}
+              mousewheel={true}
+              modules={[FreeMode, Navigation, Thumbs, Mousewheel]}
+              className="h-[400px] w-16 thumbs-swiper"
+            >
+              {cardInfo.images.map((image, idx) => (
+                <SwiperSlide key={idx} className="cursor-pointer">
+                  <div
+                    className={`w-16 h-24 bg-bg-secondary shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105 ${
+                      selectedImage === image ? 'ring-2 ring-accent-100' : ''
+                    }`}
+                  >
+                    <Image
+                      src={image || noImage}
+                      alt={`Thumbnail ${idx + 1}`}
+                      width={64}
+                      height={96}
+                      className="object-cover w-full h-full"
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
           ) : (
-            <Image src={noImage} alt={'no image'} width={64} height={96} className="object-cover" />
+            <div className="w-16 h-24">
+              <Image
+                src={cardInfo?.images?.[0] || noImage}
+                alt={'no image'}
+                width={64}
+                height={96}
+                className="object-cover"
+              />
+            </div>
           )}
         </div>
         {/* Основное изображение */}
-        <div className="w-[400px] h-auto shadow-md bg-bg-secondary rounded-lg overflow-hidden flex justify-center items-center">
-          <Image
-            src={selectedImage}
-            alt="Корм для кошек"
-            width={400}
-            height={500}
-            className="object-cover"
-          />
+        <div className="w-[400px] h-auto shadow-md bg-bg-secondary rounded-lg overflow-hidden">
+          {hasMultipleImages ? (
+            <Swiper
+              spaceBetween={10}
+              navigation={true}
+              thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+              modules={[FreeMode, Navigation, Thumbs, Keyboard]}
+              keyboard={{ enabled: true }}
+              className="main-swiper"
+              onSlideChange={swiper => setSelectedImage(cardInfo.images[swiper.activeIndex])}
+            >
+              {cardInfo.images.map((image, idx) => (
+                <SwiperSlide key={idx}>
+                  <div className="w-[400px] h-[500px] flex justify-center items-center">
+                    <Image
+                      src={image || noImage}
+                      alt={`Product image ${idx + 1}`}
+                      width={400}
+                      height={500}
+                      className="object-cover"
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          ) : (
+            <div className="w-[400px] h-[500px] flex justify-center items-center">
+              <Image
+                src={cardInfo?.images?.[0] || noImage}
+                alt="Корм для кошек"
+                width={400}
+                height={500}
+                className="object-cover"
+              />
+            </div>
+          )}
         </div>
         {/* Правая колонка с описанием */}
         <div className="flex flex-col w-auto">
@@ -142,22 +205,6 @@ export const PreviewCard = () => {
                 </ul>
               </div>
             )}
-            {/*<ul className="text-text-muted space-y-2">*/}
-            {/*  <li>Артикул</li>*/}
-            {/*  <li>Тип корма</li>*/}
-            {/*  <li>Возраст</li>*/}
-            {/*  <li>Вес упаковки</li>*/}
-            {/*  <li>Страна производства</li>*/}
-            {/*  <li>Срок годности</li>*/}
-            {/*</ul>*/}
-            {/*<ul className="ml-8 space-y-2 text-text-primary">*/}
-            {/*  <li>RC-564892</li>*/}
-            {/*  <li>Сухой</li>*/}
-            {/*  <li>Взрослые кошки (1-7 лет)</li>*/}
-            {/*  <li>2 кг</li>*/}
-            {/*  <li>Франция</li>*/}
-            {/*  <li>18 месяцев</li>*/}
-            {/*</ul>*/}
           </div>
         </div>
         {/* Блок с ценой и корзиной */}
@@ -169,17 +216,9 @@ export const PreviewCard = () => {
                 ? `${productData.price} ${cardInfo?.priceRub !== null ? '₽' : 'Br'}`
                 : 'цена не указана'}
             </span>
-            {/* <span className="text-xl text-text-secondary">300₽</span>
-            <span className="text-text-muted line-through">450₽</span> */}
           </div>
           {/* Скидка */}
-          <div className="flex items-center bg-discount/10 text-discount rounded-lg px-4 py-2 mt-4 text-lg font-semibold mb-[25px]">
-            {/* <FaLongArrowAltDown className="mr-2" />
-            <div className="flex items-center gap-5">
-              <span>50₽</span>
-              <span>скидка</span>
-            </div> */}
-          </div>
+          <div className="flex items-center bg-discount/10 text-discount rounded-lg px-4 py-2 mt-4 text-lg font-semibold mb-[25px]"></div>
           {/* Кнопка в корзину */}
           {isInCart ? (
             <Button disabled fullWidth>

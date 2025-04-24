@@ -22,3 +22,35 @@ body {
   background: var(--background);
   font-family: 'Inter', system-ui, sans-serif;
 }
+
+/* Swiper Custom Styles */
+.thumbs-swiper {
+  padding: 5px 0;
+}
+
+.thumbs-swiper .swiper-slide {
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.thumbs-swiper .swiper-slide-thumb-active {
+  opacity: 1;
+}
+
+.main-swiper {
+  --swiper-navigation-color: #637BFF;
+  --swiper-navigation-size: 25px;
+}
+
+.main-swiper .swiper-button-next,
+.main-swiper .swiper-button-prev {
+  background-color: rgba(255, 255, 255, 0.8);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.main-swiper .swiper-button-disabled {
+  opacity: 0.35;
+}
