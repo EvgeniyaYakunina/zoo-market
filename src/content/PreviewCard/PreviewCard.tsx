@@ -73,10 +73,10 @@ export const PreviewCard = () => {
     <div className="px-10 py-6 flex justify-center w-full">
       <div className="w-full max-w-[1400px] flex items-start gap-8">
         {/* Левая колонка с миниатюрами и кнопкой "Назад" */}
-        <div className="flex flex-col gap-4 h-[500px]">
+        <div className="flex flex-col h-[500px]">
           <Link
             href="/"
-            className="flex items-center gap-2 text-text-primary hover:text-text-secondary mb-4"
+            className="flex items-center gap-2 text-text-primary hover:text-text-secondary mb-2"
           >
             <FaArrowLeft className="text-xl" />
             <span>Назад</span>
@@ -90,8 +90,9 @@ export const PreviewCard = () => {
               freeMode={true}
               watchSlidesProgress={true}
               mousewheel={true}
+              navigation={true}
               modules={[FreeMode, Navigation, Thumbs, Mousewheel]}
-              className="h-[400px] w-16 thumbs-swiper"
+              className="flex-1 w-16 thumbs-swiper"
             >
               {cardInfo.images.map((image, idx) => (
                 <SwiperSlide key={idx} className="cursor-pointer">

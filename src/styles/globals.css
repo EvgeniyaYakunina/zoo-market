@@ -26,15 +26,53 @@ body {
 /* Swiper Custom Styles */
 .thumbs-swiper {
   padding: 5px 0;
+  position: relative;
 }
 
 .thumbs-swiper .swiper-slide {
-  opacity: 0.6;
+  opacity: 0.8;
   transition: all 0.3s ease;
 }
 
 .thumbs-swiper .swiper-slide-thumb-active {
   opacity: 1;
+}
+
+/* Vertical thumbs navigation buttons */
+.thumbs-swiper .swiper-button-next,
+.thumbs-swiper .swiper-button-prev {
+  background-color: rgba(255, 255, 255, 0.8);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #637BFF;
+  color:black
+}
+
+.thumbs-swiper .swiper-button-next:after,
+.thumbs-swiper .swiper-button-prev:after {
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.thumbs-swiper .swiper-button-next {
+  right: 16px;
+  bottom: 20px;
+  top: auto;
+  transform: rotate(90deg);
+}
+
+.thumbs-swiper .swiper-button-prev {
+  right: 16px;
+  top: 27px;
+  bottom: auto;
+  left: auto;
+  transform: rotate(90deg);
+}
+
+.thumbs-swiper .swiper-button-disabled {
+opacity: 0.35;
 }
 
 .main-swiper {
@@ -44,7 +82,7 @@ body {
 
 .main-swiper .swiper-button-next,
 .main-swiper .swiper-button-prev {
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 1);
   width: 30px;
   height: 30px;
   border-radius: 50%;
