@@ -1,13 +1,13 @@
+import { useGetCardByIdQuery } from '@/app/api'
 import { noImage } from '@/assets'
 import { Button, Loader } from '@/components'
+import { useCart, useErrorHandler } from '@/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { FaArrowLeft, FaLongArrowAltDown } from 'react-icons/fa'
 import { useRouter } from 'next/router'
-import { useGetCardByIdQuery } from '@/app/api'
+import { useEffect, useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
-import { useCart, useErrorHandler } from '@/hooks'
+import { FaArrowLeft } from 'react-icons/fa'
 
 export const PreviewCard = () => {
   const router = useRouter()
@@ -37,11 +37,16 @@ export const PreviewCard = () => {
   const productData = {
     id: Number(id),
     image: selectedImage || noImage,
-    price: 250,
+    price:
+      cardInfo?.priceRub !== null
+        ? cardInfo?.priceRub
+        : cardInfo?.priceByn !== null
+          ? cardInfo?.priceByn
+          : 0,
     title: cardInfo?.title || 'Название товара',
-    description: cardInfo?.description,
+    description: cardInfo?.nodeDescription,
   }
-
+  console.log('cardInfo', cardInfo)
   const { isInCart, addToCart } = useCart(Number(id), productData)
   const flavors = ['Курица', 'Говядина', 'Рыба', 'Индейка', 'Утка', 'Лосось']
 
@@ -159,17 +164,21 @@ export const PreviewCard = () => {
         <div className="w-[280px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
           {/* Цена */}
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-accent-100">250₽</span>
-            <span className="text-xl text-text-secondary">300₽</span>
-            <span className="text-text-muted line-through">450₽</span>
+            <span className="text-3xl font-bold text-accent-100">
+              {productData.price !== undefined && productData.price > 0
+                ? `${productData.price} ${cardInfo?.priceRub !== null ? '₽' : 'Br'}`
+                : 'цена не указана'}
+            </span>
+            {/* <span className="text-xl text-text-secondary">300₽</span>
+            <span className="text-text-muted line-through">450₽</span> */}
           </div>
           {/* Скидка */}
           <div className="flex items-center bg-discount/10 text-discount rounded-lg px-4 py-2 mt-4 text-lg font-semibold mb-[25px]">
-            <FaLongArrowAltDown className="mr-2" />
+            {/* <FaLongArrowAltDown className="mr-2" />
             <div className="flex items-center gap-5">
               <span>50₽</span>
               <span>скидка</span>
-            </div>
+            </div> */}
           </div>
           {/* Кнопка в корзину */}
           {isInCart ? (

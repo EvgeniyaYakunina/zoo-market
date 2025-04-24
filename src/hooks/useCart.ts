@@ -4,7 +4,7 @@ import { StaticImageData } from 'next/image'
 export type CartItem = {
   id: number
   image: string | StaticImageData
-  price: number
+  price: number | undefined
   title: string
   description: string | null | undefined
   quantity: number
