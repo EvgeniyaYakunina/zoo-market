@@ -7,6 +7,7 @@ export const palette = {
   text: {
     primary: '#171717', //dark gray/black
     secondary: '#5A5A5A', //medium gray
+    tertiary: '#868695', //light gray
     muted: '#9E9E9E', //light gray
   },
   bg: {

@@ -42,8 +42,8 @@ body {
 .thumbs-swiper .swiper-button-next,
 .thumbs-swiper .swiper-button-prev {
   background-color: rgba(255, 255, 255, 0.8);
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   color: #637BFF;
@@ -83,8 +83,8 @@ opacity: 0.35;
 .main-swiper .swiper-button-next,
 .main-swiper .swiper-button-prev {
   background-color: rgba(255, 255, 255, 1);
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }

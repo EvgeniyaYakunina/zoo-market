@@ -1,4 +1,7 @@
 import Layout from '@/components/layout/layout'
+import 'swiper/css'
+import 'swiper/css/navigation'
+import 'swiper/css/thumbs'
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
 import { Provider } from 'react-redux'

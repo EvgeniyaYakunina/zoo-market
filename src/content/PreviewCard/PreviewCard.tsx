@@ -10,16 +10,16 @@ import { BsCart2 } from 'react-icons/bs'
 import { FaArrowLeft } from 'react-icons/fa'
 import { FiCopy } from 'react-icons/fi'
 // Import Swiper and modules
+import { FreeMode, Keyboard, Mousewheel, Navigation, Thumbs } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { FreeMode, Navigation, Thumbs, Mousewheel, Keyboard } from 'swiper/modules'
 // Import Swiper styles
+import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
 import 'swiper/css/free-mode'
+import 'swiper/css/keyboard'
+import 'swiper/css/mousewheel'
 import 'swiper/css/navigation'
 import 'swiper/css/thumbs'
-import 'swiper/css/mousewheel'
-import 'swiper/css/keyboard'
-import type { Swiper as SwiperType } from 'swiper'
 
 export const PreviewCard = () => {
   const [isCopied, setIsCopied] = useState(false)
@@ -34,11 +34,17 @@ export const PreviewCard = () => {
     skip: !id,
     refetchOnMountOrArgChange: true,
   })
-  const [selectedFlavor, setSelectedFlavor] = useState(0)
+  //const [selectedFlavor, setSelectedFlavor] = useState(0)
   const [selectedImage, setSelectedImage] = useState(cardInfo?.images?.[0] || noImage)
   // For Swiper thumbnails
   const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
 
+  const [showMag, setShowMag] = useState(false)
+  const [magPos, setMagPos] = useState({ x: 0, y: 0, width: 0, height: 0 })
+  // размеры лупы в px
+  const MAG_SIZE = 400
+  // коэффициент увеличения
+  const ZOOM = 2
   useEffect(() => {
     if (cardError) {
       handleError(cardError)
@@ -64,7 +70,7 @@ export const PreviewCard = () => {
   }
   console.log('cardInfo', cardInfo)
   const { isInCart, addToCart } = useCart(Number(id), productData)
-  const flavors = ['Курица', 'Говядина', 'Рыба', 'Индейка', 'Утка', 'Лосось']
+  // const flavors = []
 
   const hasMultipleImages = cardInfo?.images && cardInfo.images.length > 1
 
@@ -122,6 +128,7 @@ export const PreviewCard = () => {
                         width={64}
                         height={96}
                         className="object-cover w-full h-full"
+                        unoptimized
                       />
                     </div>
                   </SwiperSlide>
@@ -135,6 +142,7 @@ export const PreviewCard = () => {
                   width={64}
                   height={96}
                   className="object-cover"
+                  unoptimized
                 />
               </div>
             )}
@@ -153,14 +161,43 @@ export const PreviewCard = () => {
               >
                 {cardInfo.images.map((image, idx) => (
                   <SwiperSlide key={idx}>
-                    <div className="w-[400px] h-[500px] flex justify-center items-center">
+                    <div
+                      className="relative w-[400px] h-[500px] overflow-hidden"
+                      onMouseMove={e => {
+                        const rect = e.currentTarget.getBoundingClientRect()
+                        const x = e.clientX - rect.left
+                        const y = e.clientY - rect.top
+                        setMagPos({ x, y, width: rect.width, height: rect.height })
+                        setShowMag(true)
+                      }}
+                      onMouseLeave={() => setShowMag(false)}
+                    >
                       <Image
-                        src={image || noImage}
+                        src={image}
                         alt={`Product image ${idx + 1}`}
-                        width={400}
-                        height={500}
+                        fill
+                        unoptimized
                         className="object-cover"
                       />
+
+                      {showMag && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            pointerEvents: 'none',
+                            top: magPos.y - MAG_SIZE / 2,
+                            left: magPos.x - MAG_SIZE / 2,
+                            width: MAG_SIZE,
+                            height: MAG_SIZE,
+                            border: '2px solid rgba(255,255,255,0.8)',
+                            borderRadius: '50%',
+                            backgroundImage: `url(${image})`,
+                            backgroundRepeat: 'no-repeat',
+                            backgroundSize: `${magPos.width * ZOOM}px ${magPos.height * ZOOM}px`,
+                            backgroundPosition: `-${magPos.x * ZOOM - MAG_SIZE / 2}px -${magPos.y * ZOOM - MAG_SIZE / 2}px`,
+                          }}
+                        />
+                      )}
                     </div>
                   </SwiperSlide>
                 ))}
@@ -182,7 +219,7 @@ export const PreviewCard = () => {
             {/* Заголовок */}
             <h1 className="text-2xl font-semibold text-text-primary mb-1">{cardInfo?.title}</h1>
             {/* Варианты вкусов */}
-            <div className="mt-5">
+            {/* <div className="mt-5">
               <h3 className="mb-2 text-text-secondary">Вариант: {flavors[selectedFlavor]}</h3>
               <div className="flex gap-2 flex-wrap">
                 {flavors.map((flavor, idx) => (
@@ -203,29 +240,26 @@ export const PreviewCard = () => {
                   </div>
                 ))}
               </div>
-            </div>
+            </div> */}
             {/* Характеристики */}
             <div className="mt-5 flex text-lg">
               {cardInfo?.characteristics && cardInfo.characteristics.length > 0 && (
                 <div className="mt-5">
-                  <h3 className="mb-2 text-text-secondary">Характеристики:</h3>
+                  <h3 className="mb-2 text-text-tertiary">Характеристики:</h3>
                   <ul className="text-text-primary space-y-2">
                     {cardInfo.characteristics.flat().map((char, index) => (
-                      // <li key={index} className="p-2 border border-bg-secondary rounded-md">
-                      //   <strong className="text-text-primary">{char.title}:</strong> {char.value}
-                      //   {char.description && (
-                      //     <p className="text-text-secondary text-sm mt-1">{char.description}</p>
-                      //   )}
-                      // </li>
-
                       <li
                         key={index}
                         className="p-2 border border-bg-secondary rounded-md flex justify-between items-center"
                       >
                         <div>
-                          <strong className="text-text-primary">{char.title}:</strong> {char.value}
+                          <div className="flex items-center gap-7">
+                            <span className="text-text-tertiary ">{char.title}:</span>
+                            <span>{char.value}</span>
+                          </div>
+
                           {char.description && (
-                            <p className="text-text-secondary text-sm mt-1">{char.description}</p>
+                            <p className="text-text-tertiary text-sm mt-1">{char.description}</p>
                           )}
                         </div>
 
@@ -246,7 +280,7 @@ export const PreviewCard = () => {
             </div>
           </div>
           {/* Блок с ценой и корзиной */}
-          <div className="w-[280px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
+          <div className="ml-20 w-[280px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
             {/* Цена */}
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-accent-100">
