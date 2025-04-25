@@ -50,6 +50,9 @@ importers:
       react-toastify:
         specifier: ^11.0.3
         version: 11.0.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      swiper:
+        specifier: ^11.2.6
+        version: 11.2.6
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.2.0
@@ -2077,6 +2080,10 @@ packages:
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
+
+  swiper@11.2.6:
+    resolution: {integrity: sha512-8aXpYKtjy3DjcbzZfz+/OX/GhcU5h+looA6PbAzHMZT6ESSycSp9nAjPCenczgJyslV+rUGse64LMGpWE3PX9Q==}
+    engines: {node: '>= 4.7.0'}
 
   synckit@0.9.2:
     resolution: {integrity: sha512-vrozgXDQwYO72vHjUb/HnFbQx1exDjoKzqx23aXEg2a9VIg2TSFZ8FmeZpTjUCFMYw7mpX4BE2SFu8wI7asYsw==}
@@ -4338,6 +4345,8 @@ snapshots:
       has-flag: 4.0.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
+
+  swiper@11.2.6: {}
 
   synckit@0.9.2:
     dependencies:

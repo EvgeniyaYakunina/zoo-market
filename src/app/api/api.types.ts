@@ -150,7 +150,18 @@ export type CreateCardResponse = {
   }
 }
 // for get card by id
-export type CardDetails = Omit<Node, 'nodeTypeId'> & {
+export type CardDetails = {
+  nodeId: number
+  title: string
+  nodeDescription: Nullable<string>
+  createdAt: string
+  updatedAt: string
+  removedAt: Nullable<string>
+
+  // Добавляем цены
+  priceByn: number | null
+  priceRub: number | null
+
   images: string[]
   nodeType: string
   nodeTypeDescription: Nullable<string>

@@ -40,3 +40,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.cursorignore
+.cursorrules
+
+/memory-bank
+
+project_structure.json

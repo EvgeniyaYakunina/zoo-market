@@ -9,14 +9,13 @@
   top: 93px;
   left: 0;
   z-index: 1000;
-
 }
 .loader::after {
   content: '';
   box-sizing: border-box;
   width: 0;
   height: 4.8px;
-  background: #FFF;
+  background: #fff;
   position: absolute;
   top: 0;
   left: 0;
