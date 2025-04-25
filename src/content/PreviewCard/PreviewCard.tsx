@@ -6,15 +6,15 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { BsCart2 } from 'react-icons/bs'
-import { FaArrowLeft } from 'react-icons/fa'
-import { FiCopy } from 'react-icons/fi'
 import { AiFillQuestionCircle } from 'react-icons/ai'
-import { FaShareAlt } from 'react-icons/fa'
+import { BsCart2 } from 'react-icons/bs'
+import { FaArrowLeft, FaShareAlt } from 'react-icons/fa'
+import { FiCopy } from 'react-icons/fi'
 // Import Swiper and modules
-import { FreeMode, Keyboard, Mousewheel, Navigation, Thumbs } from 'swiper/modules'
+import { FreeMode, Keyboard, Navigation, Thumbs } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 // Import Swiper styles
+import { ThumbnailSlider } from '@/components'
 import type { Swiper as SwiperType } from 'swiper'
 import 'swiper/css'
 import 'swiper/css/free-mode'
@@ -41,7 +41,7 @@ export const PreviewCard = () => {
   //const [selectedFlavor, setSelectedFlavor] = useState(0)
   const [selectedImage, setSelectedImage] = useState(cardInfo?.images?.[0] || noImage)
   // For Swiper thumbnails
-  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
+  const [thumbsSwiper] = useState<SwiperType | null>(null)
 
   const [showMag, setShowMag] = useState(false)
   const [magPos, setMagPos] = useState({ x: 0, y: 0, width: 0, height: 0 })
@@ -89,12 +89,13 @@ export const PreviewCard = () => {
     setIsCopied(true)
     setTimeout(() => setIsCopied(false), 3000)
   }
+  const handleToast = () => setIsCopied(false)
   if (isCardLoading) {
     return <Loader />
   }
   return (
     <>
-      <Toast message="Артикул скопирован" open={isCopied} onClose={() => setIsCopied(false)} />
+      <Toast message="Артикул скопирован" open={isCopied} onClose={handleToast} />
       <div className="px-10 py-6 flex justify-center w-full">
         <div className="w-full max-w-[1400px] flex items-start gap-8">
           {/* Левая колонка с миниатюрами и кнопкой "Назад" */}
@@ -106,38 +107,12 @@ export const PreviewCard = () => {
               <FaArrowLeft className="text-xl" />
               <span>Назад</span>
             </Link>
-            {hasMultipleImages ? (
-              <Swiper
-                onSwiper={setThumbsSwiper}
-                direction="vertical"
-                spaceBetween={10}
-                slidesPerView={4}
-                freeMode={true}
-                watchSlidesProgress={true}
-                mousewheel={true}
-                navigation={true}
-                modules={[FreeMode, Navigation, Thumbs, Mousewheel]}
-                className="flex-1 w-16 thumbs-swiper"
-              >
-                {cardInfo.images.map((image, idx) => (
-                  <SwiperSlide key={idx} className="cursor-pointer">
-                    <div
-                      className={`w-16 h-24 bg-bg-secondary shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105 ${
-                        selectedImage === image ? 'ring-2 ring-accent-100' : ''
-                      }`}
-                    >
-                      <Image
-                        src={image || noImage}
-                        alt={`Thumbnail ${idx + 1}`}
-                        width={64}
-                        height={96}
-                        className="object-cover w-full h-full"
-                        unoptimized
-                      />
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+            {hasMultipleImages && cardInfo?.images ? (
+              <ThumbnailSlider
+                images={cardInfo.images}
+                selectedImage={selectedImage as string}
+                onImageSelect={setSelectedImage}
+              />
             ) : (
               <div className="w-16 h-24">
                 <Image
