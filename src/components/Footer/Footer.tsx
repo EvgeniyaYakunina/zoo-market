@@ -1,170 +1,86 @@
 import { useWindowResize } from '@/hooks'
 import { useState } from 'react'
-import { FaChevronDown } from 'react-icons/fa'
+import { FooterSection } from './FooterSection'
+import { FooterLink } from './FooterLink'
 
-export function Footer() {
-  const [display, setDisplay] = useState(false)
-  const [display1, setDisplay1] = useState(false)
-  const [display2, setDisplay2] = useState(false)
+export const Footer = () => {
+  const [customersSectionOpen, setCustomersSectionOpen] = useState(false)
+  const [partnersSectionOpen, setPartnersSectionOpen] = useState(false)
+  const [companySectionOpen, setCompanySectionOpen] = useState(false)
 
   const { width } = useWindowResize()
+  const isMobile = width && width < 1024
+
+  const customerLinks = (
+    <ul>
+      <FooterLink href="#">Как сделать заказ</FooterLink>
+      <FooterLink href="#">Способы оплаты</FooterLink>
+      <FooterLink href="#">Доставка</FooterLink>
+      <FooterLink href="#">Возврат товара</FooterLink>
+      <FooterLink href="#">Возврат денежных средств</FooterLink>
+    </ul>
+  )
+
+  const partnerLinks = (
+    <ul>
+      <FooterLink href="#">Продавайте на Zoo market</FooterLink>
+      <FooterLink href="#">Водителем</FooterLink>
+    </ul>
+  )
+
+  const companyLinks = (
+    <ul>
+      <FooterLink href="#">О нас</FooterLink>
+      <FooterLink href="#">Реквизиты</FooterLink>
+    </ul>
+  )
 
   return (
     <footer className="w-full bg-accent-200 py-4 mt-auto">
       <div className="max-w-7xl mx-auto px-2">
-        <div>
-          {width && width < 1024 ? (
-            <div className="flex flex-col">
-              {/* Покупателям */}
-              <section className="border-b border-red py-4 relative">
-                <h2 className="text-white text-lg font-semibold">Покупателям</h2>
-                <ul className={`${display ? 'block' : 'hidden'} mt-3`}>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Как сделать заказ
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Способы оплаты и не только
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Доставка
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Возврат товара
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Возврат денежных средств
-                    </a>
-                  </li>
-                </ul>
-                <FaChevronDown
-                  className="absolute right-4 top-4 text-border-primary cursor-pointer"
-                  onClick={() => setDisplay(!display)}
-                />
-              </section>
+        {isMobile ? (
+          <div className="flex flex-col">
+            <FooterSection
+              title="Покупателям"
+              isOpen={customersSectionOpen}
+              onToggle={() => setCustomersSectionOpen(!customersSectionOpen)}
+              isMobile
+            >
+              {customerLinks}
+            </FooterSection>
 
-              {/* Партнерам */}
-              <section className="border-b text-border-primary py-4 relative">
-                <h2 className="text-white text-lg font-semibold">Партнерам</h2>
-                <ul className={`${display1 ? 'block' : 'hidden'} mt-3`}>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Продавайте на Zoo market
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Водителем
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Курьерам
-                    </a>
-                  </li>
-                </ul>
-                <FaChevronDown
-                  className="absolute right-4 top-4 text-border-primary cursor-pointer"
-                  onClick={() => setDisplay1(!display1)}
-                />
-              </section>
+            <FooterSection
+              title="Партнерам"
+              isOpen={partnersSectionOpen}
+              onToggle={() => setPartnersSectionOpen(!partnersSectionOpen)}
+              isMobile
+            >
+              {partnerLinks}
+            </FooterSection>
 
-              {/* Компания */}
-              <section className="border-b text-border-primary py-4 relative">
-                <h2 className="text-white text-lg font-semibold">Компания</h2>
-                <ul className={`${display2 ? 'block' : 'hidden'} mt-3`}>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      О нас
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Реквизиты
-                    </a>
-                  </li>
-                </ul>
-                <FaChevronDown
-                  className="absolute right-4 top-4 text-border-primary cursor-pointer"
-                  onClick={() => setDisplay2(!display2)}
-                />
-              </section>
-            </div>
-          ) : (
-            <div className="flex justify-between">
-              {/* Покупателям */}
-              <section className="w-1/5">
-                <h2 className="text-white text-lg font-semibold mb-4">Покупателям</h2>
-                <ul>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Как сделать заказ
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Способы оплаты
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Доставка
-                    </a>
-                  </li>
-                </ul>
-              </section>
-
-              {/* Партнерам */}
-              <section className="w-1/5">
-                <h2 className="text-white text-lg font-semibold mb-4">Партнерам</h2>
-                <ul>
-                  <li>
-                    <a className="text-gray-300 hover:text-white" href="#">
-                      Продавайте на Zoo market
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Водителем
-                    </a>
-                  </li>
-                </ul>
-              </section>
-
-              {/* Компания */}
-              <section className="w-1/5">
-                <h2 className="text-white text-lg font-semibold mb-4">Компания</h2>
-                <ul>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      О нас
-                    </a>
-                  </li>
-                  <li>
-                    <a className="text-border-primary hover:text-white" href="#">
-                      Реквизиты
-                    </a>
-                  </li>
-                </ul>
-              </section>
-            </div>
-          )}
-
-          {/* Нижняя часть футера */}
-          <div className="mt-8 text-border-primary text-sm">
-            <p>
-              2024-2025 © Zoo market — модный интернет-магазин одежды, обуви и аксессуаров для
-              животных. Все права защищены.
-            </p>
+            <FooterSection
+              title="Компания"
+              isOpen={companySectionOpen}
+              onToggle={() => setCompanySectionOpen(!companySectionOpen)}
+              isMobile
+            >
+              {companyLinks}
+            </FooterSection>
           </div>
+        ) : (
+          <div className="flex justify-between">
+            <FooterSection title="Покупателям">{customerLinks}</FooterSection>
+            <FooterSection title="Партнерам">{partnerLinks}</FooterSection>
+            <FooterSection title="Компания">{companyLinks}</FooterSection>
+          </div>
+        )}
+
+        {/* Нижняя часть футера */}
+        <div className="mt-8 text-border-primary text-sm">
+          <p>
+            2024-2025 © Zoo market — модный интернет-магазин одежды, обуви и аксессуаров для
+            животных. Все права защищены.
+          </p>
         </div>
       </div>
     </footer>
