@@ -1,6 +1,14 @@
 import { useGetCardByIdQuery } from '@/app/api'
 import { noImage } from '@/assets'
-import { Button, Loader, Toast } from '@/components'
+import {
+  Button,
+  Loader,
+  ProductDetails,
+  ProductImage,
+  ShareButton,
+  ThumbnailSlider,
+  Toast,
+} from '@/components'
 import { useCart, useErrorHandler } from '@/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -8,13 +16,9 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
 import { FaArrowLeft } from 'react-icons/fa'
-// Import Swiper and modules
 import { FreeMode, Keyboard, Navigation, Thumbs } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
-// Import Swiper styles
-import { ThumbnailSlider } from '@/components'
-import { ProductDetails } from '@/components/ProductDetails'
-import { ShareButton } from '@/components/ShareButton'
+
 import type { Swiper as SwiperType } from 'swiper'
 
 export const PreviewCard = () => {
@@ -107,16 +111,12 @@ export const PreviewCard = () => {
                 onImageSelect={setSelectedImage}
               />
             ) : (
-              <div className="w-16 h-24">
-                <Image
-                  src={cardInfo?.images?.[0] || noImage}
-                  alt={'no image'}
-                  width={64}
-                  height={96}
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
+              <ProductImage
+                src={cardInfo?.images?.[0] || noImage}
+                alt="Корм для кошек"
+                width={400}
+                height={500}
+              />
             )}
           </div>
           {/* Основное изображение */}
