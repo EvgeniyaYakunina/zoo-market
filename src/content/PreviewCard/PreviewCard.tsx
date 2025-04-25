@@ -1,6 +1,6 @@
 import { useGetCardByIdQuery } from '@/app/api'
 import { noImage } from '@/assets'
-import { Button, Loader, ShareModal } from '@/components'
+import { Button, Loader, ShareModal, Toast } from '@/components'
 import { useCart, useErrorHandler } from '@/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -94,13 +94,7 @@ export const PreviewCard = () => {
   }
   return (
     <>
-      {isCopied && (
-        <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
-          <div className="bg-black text-white px-6 py-3 rounded-md shadow-lg pointer-events-auto">
-            Артикул скопирован
-          </div>
-        </div>
-      )}
+      <Toast message="Артикул скопирован" open={isCopied} onClose={() => setIsCopied(false)} />
       <div className="px-10 py-6 flex justify-center w-full">
         <div className="w-full max-w-[1400px] flex items-start gap-8">
           {/* Левая колонка с миниатюрами и кнопкой "Назад" */}
@@ -254,7 +248,9 @@ export const PreviewCard = () => {
                                   <div>{char.description}</div>
                                   <div>
                                     {char.additionalParams
-                                      ? JSON.stringify(char.additionalParams)
+                                      ? Object.entries(char.additionalParams)
+                                          .map(([key, value]) => `${key}: ${value}`)
+                                          .join(', ')
                                       : '—'}
                                   </div>
                                 </div>
