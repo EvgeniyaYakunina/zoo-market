@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
 import { FaArrowLeft } from 'react-icons/fa'
 import { FiCopy } from 'react-icons/fi'
+import { AiFillQuestionCircle } from 'react-icons/ai'
 // Import Swiper and modules
 import { FreeMode, Keyboard, Mousewheel, Navigation, Thumbs } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -253,7 +254,25 @@ export const PreviewCard = () => {
                         className="p-2 border border-bg-secondary rounded-md flex justify-between items-center"
                       >
                         <div>
-                          <div className="flex items-center gap-7">
+                          <div className="flex items-center gap-2 relative">
+                            {char.value && (
+                              <div className="relative inline-block group">
+                                <AiFillQuestionCircle
+                                  className="text-text-tertiary cursor-pointer"
+                                  aria-label="Показать подсказку"
+                                />
+
+                                <div className=" absolute bottom-full left-1/2 -translate-x-1 mb-2 w-48 p-2 bg-bg-secondary text-sm text-text-primary rounded-md shadow-lg opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 z-10 ">
+                                  <div>{char.value}</div>
+                                  <div>{char.description}</div>
+                                  <div>
+                                    {char.additionalParams
+                                      ? JSON.stringify(char.additionalParams)
+                                      : '—'}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
                             <span className="text-text-tertiary ">{char.title}:</span>
                             <span>{char.value}</span>
                           </div>

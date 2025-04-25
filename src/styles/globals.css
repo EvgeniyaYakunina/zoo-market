@@ -46,8 +46,8 @@ body {
   height: 40px;
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  color: #637BFF;
-  color:black
+  color: #637bff;
+  color: black;
 }
 
 .thumbs-swiper .swiper-button-next:after,
@@ -72,11 +72,11 @@ body {
 }
 
 .thumbs-swiper .swiper-button-disabled {
-opacity: 0.35;
+  opacity: 0.35;
 }
 
 .main-swiper {
-  --swiper-navigation-color: #637BFF;
+  --swiper-navigation-color: #637bff;
   --swiper-navigation-size: 25px;
 }
 
