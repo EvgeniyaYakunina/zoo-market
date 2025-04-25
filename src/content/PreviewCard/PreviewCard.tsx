@@ -6,15 +6,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { AiFillQuestionCircle } from 'react-icons/ai'
 import { BsCart2 } from 'react-icons/bs'
 import { FaArrowLeft } from 'react-icons/fa'
-import { FiCopy } from 'react-icons/fi'
 // Import Swiper and modules
 import { FreeMode, Keyboard, Navigation, Thumbs } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 // Import Swiper styles
 import { ThumbnailSlider } from '@/components'
+import { ProductDetails } from '@/components/ProductDetails'
 import { ShareButton } from '@/components/ShareButton'
 import type { Swiper as SwiperType } from 'swiper'
 
@@ -187,69 +186,12 @@ export const PreviewCard = () => {
               </div>
             )}
           </div>
-          {/* Правая колонка с описанием */}
-          <div className="flex flex-col w-auto">
-            {/* Заголовок */}
-            <h1 className="text-2xl font-semibold text-text-primary mb-1">{cardInfo?.title}</h1>
-
-            {/* Характеристики */}
-            <div className="mt-5 flex text-lg">
-              {cardInfo?.characteristics && cardInfo.characteristics.length > 0 && (
-                <div className="mt-5">
-                  <h3 className="mb-2 text-text-tertiary">Характеристики:</h3>
-                  <ul className="text-text-primary space-y-2">
-                    {cardInfo.characteristics.flat().map((char, index) => (
-                      <li
-                        key={index}
-                        className="p-2 border border-bg-secondary rounded-md flex justify-between items-center"
-                      >
-                        <div>
-                          <div className="flex items-center gap-2 relative">
-                            {char.value && (
-                              <div className="relative inline-block group">
-                                <AiFillQuestionCircle
-                                  className="text-text-tertiary cursor-pointer"
-                                  aria-label="Показать подсказку"
-                                />
-
-                                <div className=" absolute bottom-full left-1/2 -translate-x-1 mb-2 w-48 p-2 bg-bg-secondary text-sm text-text-primary rounded-md shadow-lg opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 z-10 ">
-                                  <div>{char.value}</div>
-                                  <div>{char.description}</div>
-                                  <div>
-                                    {char.additionalParams
-                                      ? Object.entries(char.additionalParams)
-                                          .map(([key, value]) => `${key}: ${value}`)
-                                          .join(', ')
-                                      : '—'}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                            <span className="text-text-tertiary ">{char.title}:</span>
-                            <span>{char.value}</span>
-                          </div>
-
-                          {char.description && (
-                            <p className="text-text-tertiary text-sm mt-1">{char.description}</p>
-                          )}
-                        </div>
-
-                        {char.title === 'артикул' && (
-                          <button
-                            onClick={() => handleCopy(char.value)}
-                            className="ml-2 text-text-secondary hover:text-text-primary"
-                            aria-label="Скопировать артикул"
-                          >
-                            <FiCopy />
-                          </button>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </div>
+          {/* Компонент ProductDetails */}
+          <ProductDetails
+            title={cardInfo?.title || 'Название товара'}
+            characteristics={cardInfo?.characteristics?.flat() || []}
+            onCopy={handleCopy}
+          />
           {/* Компонент ShareButton */}
           <ShareButton url={currentUrl} title={cardInfo?.title || 'Без названия'} />
           {/* Блок с ценой и корзиной */}
