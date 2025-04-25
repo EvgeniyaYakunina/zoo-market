@@ -1,6 +1,6 @@
 import { useGetCardByIdQuery } from '@/app/api'
 import { noImage } from '@/assets'
-import { Button, Loader } from '@/components'
+import { Button, Loader, ShareModal } from '@/components'
 import { useCart, useErrorHandler } from '@/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -10,6 +10,7 @@ import { BsCart2 } from 'react-icons/bs'
 import { FaArrowLeft } from 'react-icons/fa'
 import { FiCopy } from 'react-icons/fi'
 import { AiFillQuestionCircle } from 'react-icons/ai'
+import { FaShareAlt } from 'react-icons/fa'
 // Import Swiper and modules
 import { FreeMode, Keyboard, Mousewheel, Navigation, Thumbs } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
@@ -25,6 +26,8 @@ import 'swiper/css/thumbs'
 export const PreviewCard = () => {
   const [isCopied, setIsCopied] = useState(false)
   const router = useRouter()
+  const [currentUrl, setCurrentUrl] = useState('')
+  const [showShare, setShowShare] = useState(false)
   const { id } = router.query
   const handleError = useErrorHandler()
   const {
@@ -56,6 +59,12 @@ export const PreviewCard = () => {
       setSelectedImage(cardInfo.images[0])
     }
   }, [cardInfo?.images])
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setCurrentUrl(window.location.href)
+    }
+  }, [])
 
   const productData = {
     id: Number(id),
@@ -219,29 +228,7 @@ export const PreviewCard = () => {
           <div className="flex flex-col w-auto">
             {/* Заголовок */}
             <h1 className="text-2xl font-semibold text-text-primary mb-1">{cardInfo?.title}</h1>
-            {/* Варианты вкусов */}
-            {/* <div className="mt-5">
-              <h3 className="mb-2 text-text-secondary">Вариант: {flavors[selectedFlavor]}</h3>
-              <div className="flex gap-2 flex-wrap">
-                {flavors.map((flavor, idx) => (
-                  <div
-                    key={idx}
-                    className={`w-14 h-16 bg-bg-secondary rounded-lg overflow-hidden cursor-pointer ${
-                      selectedFlavor === idx ? 'ring-2 ring-accent-100' : ''
-                    }`}
-                    onClick={() => setSelectedFlavor(idx)}
-                  >
-                    <Image
-                      src={noImage || '/placeholder.svg'}
-                      alt={`Flavor variant ${flavor}`}
-                      width={56}
-                      height={64}
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div> */}
+
             {/* Характеристики */}
             <div className="mt-5 flex text-lg">
               {cardInfo?.characteristics && cardInfo.characteristics.length > 0 && (
@@ -296,6 +283,44 @@ export const PreviewCard = () => {
                   </ul>
                 </div>
               )}
+            </div>
+          </div>
+          {/* блок поделиться */}
+          <div className="relative inline-block group">
+            <FaShareAlt
+              className="cursor-pointer text-2xl text-text-secondary hover:text-text-primary"
+              onClick={() => setShowShare(true)}
+            />
+            <ShareModal
+              isOpen={showShare}
+              onClose={() => setShowShare(false)}
+              url={currentUrl}
+              title={cardInfo?.title}
+            />
+            {/* Tooltip */}
+            <div
+              className={`
+        absolute
+        top-full
+        left-1/2
+        -translate-x-1/2
+        mt-6
+        px-3
+        py-1
+        bg-bg-secondary
+        text-text-primary
+        text-sm
+        rounded-md
+        shadow-lg
+        opacity-0
+        pointer-events-none
+        transition-opacity
+        duration-200
+        group-hover:opacity-100
+        z-10
+      `}
+            >
+              Поделиться
             </div>
           </div>
           {/* Блок с ценой и корзиной */}
