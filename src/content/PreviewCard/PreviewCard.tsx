@@ -204,8 +204,9 @@ export const PreviewCard = () => {
           />
           {/* Компонент ShareButton */}
           <ShareButton url={currentUrl} title={cardInfo?.title || 'Без названия'} />
+
           {/* Блок с ценой и корзиной */}
-          <div className="ml-20 w-[280px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
+          <div className="ml-[5%] w-[280px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
             {/* Цена */}
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-accent-100">

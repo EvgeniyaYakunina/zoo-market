@@ -1,5 +1,6 @@
 import { AiFillQuestionCircle } from 'react-icons/ai'
 import { FiCopy } from 'react-icons/fi'
+import { SizeTable } from './SizeTable'
 
 interface ProductDetailsProps {
   title: string
@@ -9,6 +10,7 @@ interface ProductDetailsProps {
     description?: string | null
     additionalParams?: Record<string, unknown> | null
   }>
+
   onCopy: (value: string) => void
   nodeId: number | null
 }
@@ -21,8 +23,13 @@ export const ProductDetails = ({ title, characteristics, onCopy, nodeId }: Produ
       description: null,
       additionalParams: null,
     },
-    ...characteristics.filter(char => char.title.toLowerCase() !== 'артикул'),
+    ...characteristics.filter(
+      char => char.title.toLowerCase() !== 'артикул' && char.title.toLowerCase() !== 'размер'
+    ),
   ]
+  const sizes = characteristics.filter(char => char.title.toLowerCase() === 'размер')
+  console.log(sizes)
+
   return (
     <div className="flex flex-col w-auto">
       {/* Заголовок */}
@@ -33,6 +40,7 @@ export const ProductDetails = ({ title, characteristics, onCopy, nodeId }: Produ
         {characteristics && characteristics.length > 0 && (
           <div className="mt-5">
             <h3 className="mb-2 text-text-tertiary">Характеристики:</h3>
+            <SizeTable sizes={sizes} />
             <ul className="text-text-primary space-y-2">
               {details.map((char, index) => (
                 <li
