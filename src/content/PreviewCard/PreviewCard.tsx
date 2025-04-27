@@ -200,6 +200,7 @@ export const PreviewCard = () => {
             title={cardInfo?.title || 'Название товара'}
             characteristics={cardInfo?.characteristics?.flat() || []}
             onCopy={handleCopy}
+            nodeId={cardInfo?.nodeId || null}
           />
           {/* Компонент ShareButton */}
           <ShareButton url={currentUrl} title={cardInfo?.title || 'Без названия'} />
