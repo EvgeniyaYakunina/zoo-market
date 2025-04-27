@@ -1,20 +1,20 @@
-import { IoPerson } from 'react-icons/io5'
-import { BsCart2 } from 'react-icons/bs'
+import { CartItem } from '@/components'
 import { ROUTES } from '@/utils/routes'
 import { useRouter } from 'next/router'
-import { CartItem } from '@/components'
+import { BsCart2 } from 'react-icons/bs'
 
 export const SignUpAndBasket = ({ carts }: { carts: CartItem[] }) => {
   const router = useRouter()
   const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
   return (
     <div className="flex space-x-6 px-4">
-      <ul className="relative flex flex-col items-center text-white/60 hover:text-white transition-all">
+      {/* TODO: add sign in if needed */}
+      {/* <ul className="relative flex flex-col items-center text-white/60 hover:text-white transition-all">
         <div className="flex flex-col items-center cursor-pointer">
           <IoPerson className="w-8 h-8 " onClick={() => router.push(ROUTES.SIGN_IN)} />
           <span className="text-sm">Войти</span>
         </div>
-      </ul>
+      </ul> */}
 
       <ul className="relative flex flex-col items-center text-white/60 hover:text-white transition-all">
         <div className="flex flex-col items-center relative cursor-pointer">

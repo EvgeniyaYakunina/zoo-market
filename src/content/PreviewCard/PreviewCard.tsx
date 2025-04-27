@@ -13,7 +13,7 @@ import { useCart, useErrorHandler } from '@/hooks'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
 import { FaArrowLeft } from 'react-icons/fa'
 import { FreeMode, Keyboard, Navigation, Thumbs } from 'swiper/modules'
@@ -37,6 +37,7 @@ export const PreviewCard = () => {
   })
   //const [selectedFlavor, setSelectedFlavor] = useState(0)
   const [selectedImage, setSelectedImage] = useState(cardInfo?.images?.[0] || noImage)
+  const swiperRef = useRef<SwiperType | null>(null)
   // For Swiper thumbnails
   const [thumbsSwiper] = useState<SwiperType | null>(null)
 
@@ -108,7 +109,11 @@ export const PreviewCard = () => {
               <ThumbnailSlider
                 images={cardInfo.images}
                 selectedImage={selectedImage as string}
-                onImageSelect={setSelectedImage}
+                onImageSelect={img => {
+                  const idx = cardInfo.images.indexOf(img)
+                  setSelectedImage(img)
+                  swiperRef.current?.slideTo(idx)
+                }}
               />
             ) : (
               <ProductImage
@@ -123,10 +128,14 @@ export const PreviewCard = () => {
           <div className="w-[400px] h-auto shadow-md bg-bg-secondary rounded-lg overflow-hidden">
             {hasMultipleImages ? (
               <Swiper
+                onSwiper={swiper => {
+                  swiperRef.current = swiper
+                }}
+                initialSlide={cardInfo.images.findIndex(i => i === selectedImage)}
                 spaceBetween={10}
-                navigation={true}
-                thumbs={{ swiper: thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+                navigation
                 modules={[FreeMode, Navigation, Thumbs, Keyboard]}
+                thumbs={{ swiper: thumbsSwiper }}
                 keyboard={{ enabled: true }}
                 className="main-swiper"
                 onSlideChange={swiper => setSelectedImage(cardInfo.images[swiper.activeIndex])}
@@ -191,11 +200,13 @@ export const PreviewCard = () => {
             title={cardInfo?.title || 'Название товара'}
             characteristics={cardInfo?.characteristics?.flat() || []}
             onCopy={handleCopy}
+            nodeId={cardInfo?.nodeId || null}
           />
           {/* Компонент ShareButton */}
           <ShareButton url={currentUrl} title={cardInfo?.title || 'Без названия'} />
+
           {/* Блок с ценой и корзиной */}
-          <div className="ml-20 w-[280px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
+          <div className="ml-[5%] w-[280px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
             {/* Цена */}
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-accent-100">

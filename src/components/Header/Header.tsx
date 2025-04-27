@@ -1,14 +1,13 @@
-import { useEffect, useState } from 'react'
+import { CardItem, useLazyGetAllCardsQuery } from '@/app/api'
+import { setCards, setSearchResults } from '@/app/store'
 import { CartItem, Search, SignUpAndBasket } from '@/components'
+import { useWindowResize } from '@/hooks'
+import { ROUTES } from '@/utils/routes'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
 import { GoHomeFill } from 'react-icons/go'
-import { IoPerson } from 'react-icons/io5'
-import { useRouter } from 'next/router'
-import { ROUTES } from '@/utils/routes'
-import { useWindowResize } from '@/hooks'
 import { useDispatch } from 'react-redux'
-import { setCards, setSearchResults } from '@/app/store'
-import { CardItem, useLazyGetAllCardsQuery } from '@/app/api'
 
 export const Header = () => {
   const router = useRouter()
@@ -77,6 +76,7 @@ export const Header = () => {
       {width && width < 900 && (
         <div className="border-t border-gray-300 block bg-white w-full p-4 fixed bottom-0 z-50 shadow-md md:hidden">
           <ul className="flex justify-around">
+            {' '}
             <li>
               <GoHomeFill onClick={handleHomeClick} className={`w-6 h-6 cursor-pointer`} />
             </li>
@@ -91,12 +91,13 @@ export const Header = () => {
                 </span>
               )}
             </li>
-            <li>
+            {/* TODO: add sign in if needed */}
+            {/* <li>
               <IoPerson
                 onClick={() => router.push(ROUTES.SIGN_IN)}
                 className={`w-6 h-6 cursor-pointer`}
               />
-            </li>
+            </li> */}
           </ul>
         </div>
       )}

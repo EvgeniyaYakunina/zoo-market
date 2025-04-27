@@ -1,5 +1,6 @@
 import { AiFillQuestionCircle } from 'react-icons/ai'
 import { FiCopy } from 'react-icons/fi'
+import { SizeTable } from './SizeTable'
 
 interface ProductDetailsProps {
   title: string
@@ -9,10 +10,26 @@ interface ProductDetailsProps {
     description?: string | null
     additionalParams?: Record<string, unknown> | null
   }>
+
   onCopy: (value: string) => void
+  nodeId: number | null
 }
 
-export const ProductDetails = ({ title, characteristics, onCopy }: ProductDetailsProps) => {
+export const ProductDetails = ({ title, characteristics, onCopy, nodeId }: ProductDetailsProps) => {
+  const details = [
+    {
+      title: 'артикул',
+      value: nodeId !== null ? String(nodeId) : '',
+      description: null,
+      additionalParams: null,
+    },
+    ...characteristics.filter(
+      char => char.title.toLowerCase() !== 'артикул' && char.title.toLowerCase() !== 'размер'
+    ),
+  ]
+  const sizes = characteristics.filter(char => char.title.toLowerCase() === 'размер')
+  console.log(sizes)
+
   return (
     <div className="flex flex-col w-auto">
       {/* Заголовок */}
@@ -23,8 +40,9 @@ export const ProductDetails = ({ title, characteristics, onCopy }: ProductDetail
         {characteristics && characteristics.length > 0 && (
           <div className="mt-5">
             <h3 className="mb-2 text-text-tertiary">Характеристики:</h3>
+            <SizeTable sizes={sizes} />
             <ul className="text-text-primary space-y-2">
-              {characteristics.map((char, index) => (
+              {details.map((char, index) => (
                 <li
                   key={index}
                   className="p-2 border border-bg-secondary rounded-md flex justify-between items-center"
