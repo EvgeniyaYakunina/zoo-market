@@ -245,7 +245,7 @@ export const Main = () => {
               key={card.nodeId}
               product={{
                 image: card.images[0] || noImage,
-                price: card.priceByn || card.priceRub || 0,
+                price: card.priceRub || card.priceByn || 0,
                 title: card.title,
                 description: card.nodeDescription || '',
                 rating: { rate: 4.5, count: 10 },

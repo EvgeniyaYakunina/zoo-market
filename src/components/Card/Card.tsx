@@ -23,7 +23,7 @@ export type ProductItemProps = {
   }
 }
 export const Card = ({ product }: ProductItemProps) => {
-  const { image, price, title, description, id, priceByn } = product
+  const { image, price, title, description, id, priceRub } = product
   const roundPrice = Math.floor(price)
   const router = useRouter()
   const { isInCart, addToCart } = useCart(id, { image, price, title, description, id })
@@ -56,7 +56,7 @@ export const Card = ({ product }: ProductItemProps) => {
           <div className="p-4">
             <b className="text-lg font-semibold">
               {roundPrice}
-              <span className="text-text-secondary ml-1">{priceByn ? 'Br' : '₽'}</span>
+              <span className="text-text-secondary ml-1">{priceRub ? '₽' : 'Br'}</span>
 
               {/* <del className="text-border-secondary">{roundPrice + 570}$</del> */}
             </b>
