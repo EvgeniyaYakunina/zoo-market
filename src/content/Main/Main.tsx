@@ -199,6 +199,7 @@ export const Main = () => {
         </div>
       )
     }
+    console.log('cardsData', cardsData)
 
     if (searchResults && searchResults.length > 0) {
       return (
@@ -208,11 +209,13 @@ export const Main = () => {
               key={card.nodeId}
               product={{
                 image: card.images[0] || noImage,
-                price: 100,
+                price: card.priceByn || card.priceRub || 0,
                 title: card.title,
                 description: card.nodeDescription || '',
                 rating: { rate: 4.5, count: 10 },
                 id: card.nodeId,
+                priceByn: card.priceByn,
+                priceRub: card.priceRub,
               }}
             />
           ))}
@@ -242,11 +245,13 @@ export const Main = () => {
               key={card.nodeId}
               product={{
                 image: card.images[0] || noImage,
-                price: 100,
+                price: card.priceByn || card.priceRub || 0,
                 title: card.title,
                 description: card.nodeDescription || '',
                 rating: { rate: 4.5, count: 10 },
                 id: card.nodeId,
+                priceByn: card.priceByn,
+                priceRub: card.priceRub,
               }}
             />
           ))}
