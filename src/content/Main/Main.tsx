@@ -1,5 +1,4 @@
-import { useGetAllCardsQuery, useGetAllFiltersQuery, useGetAllNodeTypesQuery } from '@/app/api'
-import { noImage } from '@/assets'
+import { useGetAllCardsQuery, useGetAllNodeTypesQuery } from '@/app/api'
 import {
   Button,
   Card,
@@ -18,10 +17,10 @@ import {
   AccordionTrigger,
 } from '@radix-ui/react-accordion'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/app/store'
-import { UPDATE_ALL_CARDS_INTERVAL } from '@/utils'
+import { noImage } from '@/assets'
 
 type Filter = {
   characteristicId: number
@@ -31,53 +30,45 @@ type Filter = {
 
 type SidebarProps = {
   className?: string
-  onApplyFilters: (filters: Record<string, string>) => void
+  onApplyFilters: (filters: Record<string, string[]>) => void
   filters?: Filter[]
   isLoading?: boolean
 }
 
 const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps) => {
-  const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({})
+  const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({})
 
-  useEffect(() => {
-    setSelectedFilters({})
-  }, [filters])
-
-  const handleCheckboxChange = (filterTitle: string, value: string) => {
-    setSelectedFilters(prev => ({
-      ...prev,
-      [filterTitle]: prev[filterTitle] === value ? '' : value,
-    }))
+  const handleCheckboxChange = (key: string, value: string) => {
+    setSelectedFilters(prev => {
+      const vals = prev[key] || []
+      const nextVals = vals.includes(value) ? vals.filter(v => v !== value) : [...vals, value]
+      const next = { ...prev }
+      if (nextVals.length) next[key] = nextVals
+      else delete next[key]
+      return next
+    })
   }
 
   const applyFilters = () => {
-    const applied = Object.keys(selectedFilters).reduce(
-      (acc, key) => {
-        if (selectedFilters[key]) acc[key] = selectedFilters[key]
-        return acc
-      },
-      {} as Record<string, string>
-    )
-    onApplyFilters(applied)
+    onApplyFilters(selectedFilters)
+  }
+
+  if (isLoading) return <Loader />
+  if (!filters || !Array.isArray(filters) || filters.length === 0) {
+    return <aside className={`w-[20%] ...`}>Нет фильтров</aside>
   }
 
   if (isLoading) return <Loader />
   if (!filters) return null
 
-  console.log('Current filters:', filters)
-
   return (
     <aside className={`w-[20%] min-h-screen bg-bg-secondary p-4 shadow-md ${className}`}>
       <Accordion type="multiple" className="w-full">
         {filters.map(filter => {
-          console.log(`Rendering filter: ${filter.title}`, filter.values)
+          const key = filter.title.toLowerCase().trim()
 
           return (
-            <AccordionItem
-              key={filter.characteristicId}
-              value={`item-${filter.characteristicId}`}
-              className="border-b"
-            >
+            <AccordionItem key={filter.characteristicId} value={`item-${key}`} className="border-b">
               <AccordionTrigger className="group flex items-center justify-between w-full text-left py-2 px-4 text-text-primary font-medium hover:text-accent-100">
                 {filter.title}
                 <ChevronDownIcon
@@ -89,30 +80,34 @@ const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps
                 {filter.title.toLowerCase() === 'скидка' ? (
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      checked={selectedFilters['Скидка'] === 'true'}
-                      onCheckedChange={() =>
-                        handleCheckboxChange(
-                          'Скидка',
-                          selectedFilters['Скидка'] === 'true' ? '' : 'true'
-                        )
-                      }
+                      checked={selectedFilters[key]?.includes('true') ?? false}
+                      onCheckedChange={() => handleCheckboxChange(key, 'true')}
+                      id={`discount-${key}`}
                     />
                     <span className="cursor-pointer hover:text-blue-500">Скидка</span>
                   </div>
                 ) : (
                   <ul className="space-y-2">
-                    {filter.values.map((value, index) => (
-                      <li
-                        key={`${filter.characteristicId}-${index}`}
-                        className="flex items-center space-x-2"
-                      >
-                        <Checkbox
-                          checked={selectedFilters[filter.title] === value}
-                          onCheckedChange={() => handleCheckboxChange(filter.title, value)}
-                        />
-                        <span className="cursor-pointer hover:text-blue-500">{value}</span>
-                      </li>
-                    ))}
+                    {filter.values.map(value => {
+                      const isChecked = selectedFilters[key]?.includes(value) ?? false
+                      return (
+                        <li key={`${key}-${value}`} className="flex items-center space-x-2">
+                          <Checkbox
+                            checked={isChecked}
+                            onCheckedChange={() => {
+                              handleCheckboxChange(key, value)
+                            }}
+                            id={`${key}-${value}`}
+                          />
+                          <label
+                            htmlFor={`${key}-${value}`}
+                            className="cursor-pointer hover:text-blue-500"
+                          >
+                            {value}
+                          </label>
+                        </li>
+                      )
+                    })}
                   </ul>
                 )}
               </AccordionContent>
@@ -131,6 +126,9 @@ const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps
 }
 
 export const Main = () => {
+  const handleError = useErrorHandler()
+  const searchResults = useSelector((state: RootState) => state.search.results)
+
   const {
     data: nodeTypes,
     isLoading: isLoadingNodeTypes,
@@ -138,28 +136,67 @@ export const Main = () => {
   } = useGetAllNodeTypesQuery({ page: 1, size: 10 })
 
   const [selectedNodeTypeId, setSelectedNodeTypeId] = useState<number | null>(null)
-  const [selectedCharacteristics, setSelectedCharacteristics] = useState<Record<string, string>>({})
+  const [selectedCharacteristics, setSelectedCharacteristics] = useState<Record<string, string[]>>(
+    {}
+  )
   const [filtersApplied, setFiltersApplied] = useState(false)
+  const [dynamicFilters, setDynamicFilters] = useState<Filter[]>([])
 
-  // Получаем фильтры с учетом выбранной категории
-  const { data: filters, isLoading: isLoadingFilters } = useGetAllFiltersQuery(
-    selectedNodeTypeId ? { nodeTypeId: selectedNodeTypeId } : {}
+  const {
+    data: allCardsData,
+    isLoading: allCardsLoading,
+    error: allCardsError,
+  } = useGetAllCardsQuery(
+    {
+      pageNumber: 1,
+      pageSize: 1000,
+      nodeTypeId: selectedNodeTypeId ?? undefined,
+      filters: {},
+    },
+    { refetchOnMountOrArgChange: true }
   )
 
-  const handleNodeTypeChange = (nodeTypeId: number) => {
-    setSelectedNodeTypeId(nodeTypeId)
+  useEffect(() => {
+    if (!allCardsData?.items) {
+      setDynamicFilters([])
+      return
+    }
+    const map: Record<string, Set<string>> = {}
+    allCardsData.items.forEach(card => {
+      card.characteristics.forEach(group => {
+        group.forEach(({ title, value }) => {
+          if (!map[title]) map[title] = new Set()
+          map[title].add(value)
+        })
+      })
+    })
+    const newFilters: Filter[] = Object.entries(map).map(([title, set], idx) => ({
+      characteristicId: idx,
+      title,
+      values: Array.from(set),
+    }))
+    setDynamicFilters(newFilters)
     setSelectedCharacteristics({})
     setFiltersApplied(false)
-  }
+  }, [allCardsData])
 
-  const handleError = useErrorHandler()
-  const searchResults = useSelector((state: RootState) => state.search.results)
+  const displayedCards = useMemo(() => {
+    if (!filtersApplied || !allCardsData?.items) {
+      return allCardsData?.items || []
+    }
+    return allCardsData.items.filter(card =>
+      Object.entries(selectedCharacteristics).every(([key, values]) => {
+        const group = card.characteristics.find(g => g[0]?.title === key)
+        if (!group) return false
+        return group.some(item => values.includes(item.value))
+      })
+    )
+  }, [allCardsData, selectedCharacteristics, filtersApplied])
 
   useEffect(() => {
-    if (nodeTypesError) {
-      handleError(nodeTypesError)
-    }
-  }, [nodeTypesError])
+    if (nodeTypesError) handleError(nodeTypesError)
+    if (allCardsError) handleError(allCardsError)
+  }, [nodeTypesError, allCardsError])
 
   useEffect(() => {
     const resetHandler = () => {
@@ -171,35 +208,23 @@ export const Main = () => {
     return () => window.removeEventListener('resetFilters', resetHandler)
   }, [])
 
-  const {
-    data: cardsData,
-    isLoading: isLoadingCards,
-    isFetching,
-    error: cardsError,
-  } = useGetAllCardsQuery(
-    {
-      pageNumber: 1,
-      pageSize: 50,
-      nodeTypeId: selectedNodeTypeId !== null ? selectedNodeTypeId : undefined,
-      filters: selectedCharacteristics,
-    },
-    { refetchOnMountOrArgChange: true, pollingInterval: UPDATE_ALL_CARDS_INTERVAL }
-  )
-
-  const handleApplyFilters = (filters: Record<string, string>) => {
+  const handleApplyFilters = (filters: Record<string, string[]>) => {
     setSelectedCharacteristics(filters)
     setFiltersApplied(Object.keys(filters).length > 0)
   }
 
+  const handleCategoryChange = (id: number) => {
+    setSelectedNodeTypeId(id)
+  }
+
   const renderContent = () => {
-    if (cardsError) {
+    if (allCardsError) {
       return (
         <div className="flex items-center justify-center w-full h-[calc(100vh-200px)] pl-[500px]">
           <div className="text-4xl font-semibold text-text-primary">Товары не найдены</div>
         </div>
       )
     }
-    console.log('cardsData', cardsData)
 
     if (searchResults && searchResults.length > 0) {
       return (
@@ -223,13 +248,11 @@ export const Main = () => {
       )
     }
 
-    if (isLoadingCards || isFetching) {
+    if (allCardsLoading) {
       return <Loader />
     }
 
-    const hasFilters = filtersApplied || selectedNodeTypeId !== null
-
-    if (hasFilters && (!cardsData?.items || cardsData.items.length === 0)) {
+    if (displayedCards.length === 0) {
       return (
         <div className="flex items-center justify-center w-full h-[calc(100vh-200px)]">
           <div className="text-4xl font-semibold text-text-primary">Товары не найдены</div>
@@ -237,31 +260,23 @@ export const Main = () => {
       )
     }
 
-    if (cardsData?.items && cardsData.items.length > 0) {
-      return (
-        <div className="flex flex-wrap justify-center">
-          {cardsData.items.map(card => (
-            <Card
-              key={card.nodeId}
-              product={{
-                image: card.images[0] || noImage,
-                price: card.priceRub || card.priceByn || 0,
-                title: card.title,
-                description: card.nodeDescription || '',
-                rating: { rate: 4.5, count: 10 },
-                id: card.nodeId,
-                priceByn: card.priceByn,
-                priceRub: card.priceRub,
-              }}
-            />
-          ))}
-        </div>
-      )
-    }
-
     return (
-      <div className="flex items-center justify-center pl-[100px] w-full h-[calc(100vh-200px)]">
-        <div className="text-4xl font-semibold text-text-primary">Товары не найдены</div>
+      <div className="flex flex-wrap justify-center">
+        {displayedCards.map(card => (
+          <Card
+            key={card.nodeId}
+            product={{
+              image: card.images[0] || noImage,
+              price: card.priceRub || card.priceByn || 0,
+              title: card.title,
+              description: card.nodeDescription || '',
+              rating: { rate: 4.5, count: 10 },
+              id: card.nodeId,
+              priceByn: card.priceByn,
+              priceRub: card.priceRub,
+            }}
+          />
+        ))}
       </div>
     )
   }
@@ -280,7 +295,7 @@ export const Main = () => {
               <TabsTrigger
                 key={nt.id}
                 value={nt.id.toString()}
-                onClick={() => handleNodeTypeChange(nt.id)}
+                onClick={() => handleCategoryChange(nt.id)}
                 className="text-white text-xl font-bold hover:text-accent-100 whitespace-nowrap"
               >
                 {nt.type}
@@ -292,8 +307,8 @@ export const Main = () => {
         <div className="flex w-full min-h-screen">
           <Sidebar
             onApplyFilters={handleApplyFilters}
-            filters={filters}
-            isLoading={isLoadingFilters}
+            filters={dynamicFilters}
+            isLoading={allCardsLoading}
             key={selectedNodeTypeId || 'all'}
           />
 

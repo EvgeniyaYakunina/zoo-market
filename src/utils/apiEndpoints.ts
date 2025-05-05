@@ -37,30 +37,34 @@ export const ApiEndpoints = {
   // Cards
   CREATE_CARD: 'cards',
   GET_CARD_BY_ID: (id: number) => `cards/${id}`,
-  GET_ALL_CARDS: ({
-    pageNumber = 1,
-    pageSize = 50,
-    nodeTypeId,
-    filters,
-  }: {
-    pageNumber?: number
-    pageSize?: number
-    nodeTypeId?: number
-    filters?: Record<string, string>
-  } = {}) => {
-    const params: string[] = []
-    if (nodeTypeId !== undefined) {
-      params.push(`nodeTypeId=${nodeTypeId}`)
+
+  GET_ALL_CARDS: (
+    args: {
+      pageNumber?: number
+      pageSize?: number
+      nodeTypeId?: number
+      filters?: Record<string, string[]>
+    } = {}
+  ) => {
+    const { pageNumber = 1, pageSize = 50, nodeTypeId, filters } = args
+    const params = new URLSearchParams()
+    params.append('pageNumber', String(pageNumber))
+    params.append('pageSize', String(pageSize))
+    if (nodeTypeId != null) {
+      params.append('nodeTypeId', String(nodeTypeId))
     }
-    params.push(`pageNumber=${pageNumber}`)
-    params.push(`pageSize=${pageSize}`)
+
     if (filters) {
-      Object.keys(filters).forEach(key => {
-        params.push(`${encodeURIComponent(key)}=${encodeURIComponent(filters[key])}`)
+      Object.entries(filters).forEach(([key, values]) => {
+        values.forEach(v => {
+          params.append(key, v)
+        })
       })
     }
-    return `cards?${params.join('&')}`
+
+    return params.toString()
   },
+
   SEARCH_CARDS: 'cards/search',
 
   // Files
