@@ -21,9 +21,10 @@ export const ZoomableImage = ({
 
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
-    const x = (e.clientX - rect.left) / rect.width
-    const y = (e.clientY - rect.top) / rect.height
-    setPos({ x, y })
+    setPos({
+      x: (e.clientX - rect.left) / rect.width,
+      y: (e.clientY - rect.top) / rect.height,
+    })
   }
 
   return (
@@ -34,36 +35,17 @@ export const ZoomableImage = ({
       onMouseLeave={() => setHover(false)}
       onMouseMove={onMouseMove}
     >
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        className="object-cover"
-        unoptimized
-      />
+      <Image src={src} alt={alt} fill style={{ objectFit: 'cover' }} unoptimized />
 
       {hover && (
         <div
+          className="absolute top-0 left-0 right-0 bottom-0 pointer-events-none"
           style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width,
-            height,
-            pointerEvents: 'none',
             transformOrigin: `${pos.x * 100}% ${pos.y * 100}%`,
             transform: `scale(${zoomFactor})`,
           }}
         >
-          <Image
-            src={src}
-            alt={alt}
-            width={width}
-            height={height}
-            className="object-cover"
-            unoptimized
-          />
+          <Image src={src} alt={alt} fill style={{ objectFit: 'cover' }} unoptimized />
         </div>
       )}
     </div>
