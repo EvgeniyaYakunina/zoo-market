@@ -206,10 +206,15 @@ export const api = createApi({
         pageNumber?: number
         pageSize?: number
         nodeTypeId?: number
-        filters?: Record<string, string>
+        filters?: Record<string, string[]>
       }
     >({
-      query: (args = {}) => GET_ALL_CARDS(args),
+      query: args => {
+        const qs = GET_ALL_CARDS(args)
+        return {
+          url: `cards?${qs}`,
+        }
+      },
     }),
 
     searchCards: builder.mutation<CardItem[], { text: string; limit: number }>({
