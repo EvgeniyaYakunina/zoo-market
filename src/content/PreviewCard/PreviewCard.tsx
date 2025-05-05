@@ -8,6 +8,7 @@ import {
   ShareButton,
   ThumbnailSlider,
   Toast,
+  ZoomableImage,
 } from '@/components'
 import { useCart, useErrorHandler } from '@/hooks'
 import Image from 'next/image'
@@ -41,12 +42,6 @@ export const PreviewCard = () => {
   // For Swiper thumbnails
   const [thumbsSwiper] = useState<SwiperType | null>(null)
 
-  const [showMag, setShowMag] = useState(false)
-  const [magPos, setMagPos] = useState({ x: 0, y: 0, width: 0, height: 0 })
-  // размеры лупы в px
-  const MAG_SIZE = 400
-  // коэффициент увеличения
-  const ZOOM = 2
   useEffect(() => {
     if (cardError) {
       handleError(cardError)
@@ -142,44 +137,13 @@ export const PreviewCard = () => {
               >
                 {cardInfo.images.map((image, idx) => (
                   <SwiperSlide key={idx}>
-                    <div
-                      className="relative w-[400px] h-[500px] overflow-hidden"
-                      onMouseMove={e => {
-                        const rect = e.currentTarget.getBoundingClientRect()
-                        const x = e.clientX - rect.left
-                        const y = e.clientY - rect.top
-                        setMagPos({ x, y, width: rect.width, height: rect.height })
-                        setShowMag(true)
-                      }}
-                      onMouseLeave={() => setShowMag(false)}
-                    >
-                      <Image
-                        src={image}
-                        alt={`Product image ${idx + 1}`}
-                        fill
-                        unoptimized
-                        className="object-cover"
-                      />
-
-                      {showMag && (
-                        <div
-                          style={{
-                            position: 'absolute',
-                            pointerEvents: 'none',
-                            top: magPos.y - MAG_SIZE / 2,
-                            left: magPos.x - MAG_SIZE / 2,
-                            width: MAG_SIZE,
-                            height: MAG_SIZE,
-                            border: '2px solid rgba(255,255,255,0.8)',
-                            borderRadius: '50%',
-                            backgroundImage: `url(${image})`,
-                            backgroundRepeat: 'no-repeat',
-                            backgroundSize: `${magPos.width * ZOOM}px ${magPos.height * ZOOM}px`,
-                            backgroundPosition: `-${magPos.x * ZOOM - MAG_SIZE / 2}px -${magPos.y * ZOOM - MAG_SIZE / 2}px`,
-                          }}
-                        />
-                      )}
-                    </div>
+                    <ZoomableImage
+                      src={image}
+                      alt={`Product image ${idx + 1}`}
+                      width={400}
+                      height={500}
+                      zoomFactor={2}
+                    />
                   </SwiperSlide>
                 ))}
               </Swiper>
