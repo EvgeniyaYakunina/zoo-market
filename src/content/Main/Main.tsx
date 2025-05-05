@@ -38,6 +38,12 @@ type SidebarProps = {
 const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps) => {
   const [selectedFilters, setSelectedFilters] = useState<Record<string, string[]>>({})
 
+  useEffect(() => {
+    const resetHandler = () => setSelectedFilters({})
+    window.addEventListener('resetFilters', resetHandler)
+    return () => window.removeEventListener('resetFilters', resetHandler)
+  }, [])
+
   const handleCheckboxChange = (key: string, value: string) => {
     setSelectedFilters(prev => {
       const vals = prev[key] || []
