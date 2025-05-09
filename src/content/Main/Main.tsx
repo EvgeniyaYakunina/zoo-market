@@ -1,4 +1,4 @@
-import { useGetAllCardsQuery, useGetAllNodeTypesQuery } from '@/app/api'
+import { useGetAllCardsQuery, useGetAllFiltersQuery, useGetAllNodeTypesQuery } from '@/app/api'
 import {
   Button,
   Card,
@@ -162,29 +162,40 @@ export const Main = () => {
     { refetchOnMountOrArgChange: true }
   )
 
+  const { data: allFiltersData, isLoading: filtersLoading } = useGetAllFiltersQuery({
+    nodeTypeId: selectedNodeTypeId ?? undefined,
+  })
+
   useEffect(() => {
-    if (!allCardsData?.items) {
+    if (!allFiltersData || !allCardsData?.items) {
       setDynamicFilters([])
       return
     }
-    const map: Record<string, Set<string>> = {}
-    allCardsData.items.forEach(card => {
-      card.characteristics.forEach(group => {
-        group.forEach(({ title, value }) => {
-          if (!map[title]) map[title] = new Set()
-          map[title].add(value)
-        })
+
+    const presentMap: Record<number, Set<string>> = {}
+
+    allCardsData.items.forEach(card =>
+      card.characteristics.flat().forEach(({ title, value }) => {
+        const master = allFiltersData.find(f => f.title === title)
+        if (!master) return
+        const id = master.characteristicId
+        if (!presentMap[id]) presentMap[id] = new Set()
+        presentMap[id].add(value)
       })
-    })
-    const newFilters: Filter[] = Object.entries(map).map(([title, set], idx) => ({
-      characteristicId: idx,
-      title,
-      values: Array.from(set),
-    }))
+    )
+
+    const newFilters: Filter[] = allFiltersData
+      .filter(f => presentMap[f.characteristicId]?.size > 0)
+      .map(f => ({
+        characteristicId: f.characteristicId,
+        title: f.title,
+        values: Array.from(presentMap[f.characteristicId]),
+      }))
+
     setDynamicFilters(newFilters)
     setSelectedCharacteristics({})
     setFiltersApplied(false)
-  }, [allCardsData])
+  }, [allFiltersData, allCardsData])
 
   const displayedCards = useMemo(() => {
     if (!filtersApplied || !allCardsData?.items) {
@@ -314,7 +325,7 @@ export const Main = () => {
           <Sidebar
             onApplyFilters={handleApplyFilters}
             filters={dynamicFilters}
-            isLoading={allCardsLoading}
+            isLoading={allCardsLoading || filtersLoading}
             key={selectedNodeTypeId || 'all'}
           />
 
