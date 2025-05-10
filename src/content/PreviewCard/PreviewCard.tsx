@@ -57,8 +57,9 @@ export const PreviewCard = () => {
     basePrice != null && sale != null ? +(basePrice * (1 - sale / 100)).toFixed(2) : basePrice
 
   // сколько экономим
-  const savedAmount =
-    basePrice != null && discountedPrice != null ? +(basePrice - discountedPrice).toFixed(2) : null
+  // const savedAmount =
+  //   basePrice != null && discountedPrice != null ? +(basePrice -
+  //   discountedPrice).toFixed(2) : null
 
   useEffect(() => {
     if (cardError) {
@@ -185,7 +186,7 @@ export const PreviewCard = () => {
           <ShareButton url={currentUrl} title={cardInfo?.title || 'Без названия'} />
 
           {/* Блок с ценой и корзиной */}
-          <div className="ml-[5%] w-[300px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
+          <div className="flex flex-col gap-12 ml-[5%] w-[300px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
             {basePrice != null ? (
               <>
                 {/* Цена и старая цена */}
@@ -206,12 +207,12 @@ export const PreviewCard = () => {
                 </div>
 
                 {/* Блок с экономией */}
-                {savedAmount != null && (
+                {/* {savedAmount != null && (
                   <div className="flex items-center bg-discount/10 text-discount rounded-lg px-4 py-2 mt-4 text-lg font-semibold mb-[25px]">
                     <span className="mr-1">▲</span>
                     {savedAmount.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} {symbol}
                   </div>
-                )}
+                )} */}
 
                 {/* Кнопка в корзину */}
                 {isInCart ? (
