@@ -275,7 +275,7 @@ export const Main = () => {
             <Card
               key={card.nodeId}
               product={{
-                image: card.images[0] || noImage,
+                image: card.images[0] || noImage.src,
                 price: card.priceByn || card.priceRub || 0,
                 title: card.title,
                 description: card.nodeDescription || '',
