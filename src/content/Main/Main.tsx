@@ -45,9 +45,11 @@ const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps
   }, [])
 
   const handleCheckboxChange = (key: string, value: string) => {
-    setSelectedFilters(prev => {
+    setSelectedFilters((prev: Record<string, string[]>) => {
       const vals = prev[key] || []
-      const nextVals = vals.includes(value) ? vals.filter(v => v !== value) : [...vals, value]
+      const nextVals = vals.includes(value)
+        ? vals.filter((v: string) => v !== value)
+        : [...vals, value]
       const next = { ...prev }
       if (nextVals.length) next[key] = nextVals
       else delete next[key]
@@ -129,6 +131,15 @@ const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps
       </div>
     </aside>
   )
+}
+
+type CardType = {
+  nodeId: number
+  images: string[]
+  priceByn: number | null
+  priceRub: number | null
+  title: string
+  nodeDescription?: string
 }
 
 export const Main = () => {
@@ -279,7 +290,7 @@ export const Main = () => {
 
     return (
       <div className="flex flex-wrap justify-center">
-        {displayedCards.map(card => (
+        {displayedCards.map((card: CardType) => (
           <Card
             key={card.nodeId}
             product={{
