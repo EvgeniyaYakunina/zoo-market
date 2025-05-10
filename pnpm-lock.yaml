@@ -38,6 +38,9 @@ importers:
       react:
         specifier: ^19.1.0
         version: 19.1.0
+      react-country-flag:
+        specifier: ^3.1.0
+        version: 3.1.0(react@19.1.0)
       react-dom:
         specifier: ^19.1.0
         version: 19.1.0(react@19.1.0)
@@ -3078,6 +3081,12 @@ packages:
   raw-body@3.0.0:
     resolution: {integrity: sha512-RmkhL8CAyCRPXCE28MMH0z2PNWQBNk2Q09ZdxM9IOOXwxwZbN+qbWaatPkdkWIKL2ZVDImrN/pK5HTRz2PcS4g==}
     engines: {node: '>= 0.8'}
+
+  react-country-flag@3.1.0:
+    resolution: {integrity: sha512-JWQFw1efdv9sTC+TGQvTKXQg1NKbDU2mBiAiRWcKM9F1sK+/zjhP2yGmm8YDddWyZdXVkR8Md47rPMJmo4YO5g==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
 
   react-dom@19.1.0:
     resolution: {integrity: sha512-Xs1hdnE+DyKgeHJeJznQmYMIBG3TKIHJJT95Q58nHLSrElKlGQqDTR2HQ9fx5CN/Gk6Vh/kupBTDLU11/nDk/g==}
@@ -7144,6 +7153,10 @@ snapshots:
       http-errors: 2.0.0
       iconv-lite: 0.6.3
       unpipe: 1.0.0
+
+  react-country-flag@3.1.0(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   react-dom@19.1.0(react@19.1.0):
     dependencies:

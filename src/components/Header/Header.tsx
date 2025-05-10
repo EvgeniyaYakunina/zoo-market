@@ -10,6 +10,7 @@ import { BsCart2 } from 'react-icons/bs'
 import { FiCheck } from 'react-icons/fi'
 import { GoHomeFill } from 'react-icons/go'
 import { useDispatch, useSelector } from 'react-redux'
+import ReactCountryFlag from 'react-country-flag'
 
 export const Header = () => {
   const router = useRouter()
@@ -48,7 +49,7 @@ export const Header = () => {
   }
 
   // ========== currency selector ==========
-  const currency = useSelector((s: RootState) => s.currency.value)
+  const currency = useSelector((state: RootState) => state.currency.value)
   const [openCur, setOpenCur] = useState(false)
   const curRef = useRef<HTMLDivElement>(null)
 
@@ -103,31 +104,39 @@ export const Header = () => {
               <div ref={curRef} className="relative">
                 <button
                   onClick={() => setOpenCur(o => !o)}
-                  className="flex items-center bg-white text-black rounded px-2 py-1"
+                  className="flex items-center border border-gray-200 text-black rounded-lg px-3 py-2 shadow-sm w-max"
                 >
-                  <span className="mr-1">{currency === 'RUB' ? '🇷🇺' : '🇧🇾'}</span>
+                  <ReactCountryFlag
+                    countryCode={currency === 'RUB' ? 'RU' : 'BY'}
+                    svg
+                    className="w-5 h-5 mr-2"
+                  />
                   <span className="font-medium">{currency}</span>
-                  <span className="ml-1 text-sm">▾</span>
                 </button>
 
                 {openCur && (
-                  <ul className="absolute right-0 mt-2 w-40 bg-white border rounded shadow-lg overflow-hidden">
-                    <li
-                      className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleCurrencySelect('RUB')}
-                    >
-                      <span className="mr-2">🇷🇺</span>
-                      <span className="flex-1">RUB Российский рубль</span>
-                      {currency === 'RUB' && <FiCheck />}
-                    </li>
-                    <li
-                      className="flex items-center px-3 py-2 hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleCurrencySelect('BYN')}
-                    >
-                      <span className="mr-2">🇧🇾</span>
-                      <span className="flex-1">BYN Белорусский рубль</span>
-                      {currency === 'BYN' && <FiCheck />}
-                    </li>
+                  <ul className="absolute top-10 left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden z-20">
+                    {[
+                      { code: 'RU', label: 'RUB Российский рубль', value: 'RUB' as Currency },
+                      { code: 'BY', label: 'BYN Белорусский рубль', value: 'BYN' as Currency },
+                    ].map(opt => (
+                      <li
+                        key={opt.value}
+                        onClick={() => handleCurrencySelect(opt.value)}
+                        className={`
+                          flex items-center justify-between
+                          px-4 py-2 text-sm text-gray-700
+                          hover:bg-gray-50 cursor-pointer
+                          ${currency === opt.value ? 'bg-gray-200' : ''}
+                        `}
+                      >
+                        <div className="flex items-center">
+                          <ReactCountryFlag countryCode={opt.code} svg className="w-5 h-5 mr-2" />
+                          <span>{opt.label}</span>
+                        </div>
+                        {currency === opt.value && <FiCheck className="text-gray-600" />}
+                      </li>
+                    ))}
                   </ul>
                 )}
               </div>
