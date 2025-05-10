@@ -166,6 +166,7 @@ export type CardDetails = {
   nodeType: string
   nodeTypeDescription: Nullable<string>
   characteristics: CharacteristicResponse[][]
+  sale: number | null
 }
 
 // Новый тип для отдельной карточки в ответе getAllCards
