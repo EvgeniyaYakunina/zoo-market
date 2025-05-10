@@ -166,6 +166,7 @@ export type CardDetails = {
   nodeType: string
   nodeTypeDescription: Nullable<string>
   characteristics: CharacteristicResponse[][]
+  sale: number | null
 }
 
 // Новый тип для отдельной карточки в ответе getAllCards
@@ -178,6 +179,7 @@ export type CardItem = Omit<Node, 'id' | 'nodeTypeId' | 'description'> & {
   characteristics: CharacteristicResponse[][]
   priceByn: number | null
   priceRub: number | null
+  sale: number | null
 }
 
 // Новый тип для ответа getAllCards

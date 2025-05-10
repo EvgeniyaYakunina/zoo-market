@@ -1,4 +1,5 @@
 import { useGetCardByIdQuery } from '@/app/api'
+import { RootState } from '@/app/store'
 import { noImage } from '@/assets'
 import {
   Button,
@@ -17,6 +18,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
 import { FaArrowLeft } from 'react-icons/fa'
+import { useSelector } from 'react-redux'
 import { FreeMode, Keyboard, Navigation, Thumbs } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
@@ -42,6 +44,22 @@ export const PreviewCard = () => {
   // For Swiper thumbnails
   const [thumbsSwiper] = useState<SwiperType | null>(null)
 
+  const currency = useSelector((state: RootState) => state.currency.value)
+  const symbol = currency === 'BYN' ? 'Br' : '₽'
+
+  // базовая цена в текущей валюте
+  const basePrice = currency === 'BYN' ? cardInfo?.priceByn : cardInfo?.priceRub
+  // скидка в процентах
+  const sale = cardInfo?.sale ?? null
+
+  // вычисляем цену со скидкой, если есть sale
+  const discountedPrice =
+    basePrice != null && sale != null ? +(basePrice * (1 - sale / 100)).toFixed(2) : basePrice
+
+  // сколько экономим
+  const savedAmount =
+    basePrice != null && discountedPrice != null ? +(basePrice - discountedPrice).toFixed(2) : null
+
   useEffect(() => {
     if (cardError) {
       handleError(cardError)
@@ -62,14 +80,11 @@ export const PreviewCard = () => {
   const productData = {
     id: Number(id),
     image: selectedImage || noImage,
-    price:
-      cardInfo?.priceRub !== null
-        ? cardInfo?.priceRub
-        : cardInfo?.priceByn !== null
-          ? cardInfo?.priceByn
-          : 0,
+    price: discountedPrice || 0,
     title: cardInfo?.title || 'Название товара',
     description: cardInfo?.nodeDescription,
+    priceByn: cardInfo?.priceByn,
+    priceRub: cardInfo?.priceRub,
   }
   console.log('cardInfo', cardInfo)
   const { isInCart, addToCart } = useCart(Number(id), productData)
@@ -161,7 +176,7 @@ export const PreviewCard = () => {
           </div>
           {/* Компонент ProductDetails */}
           <ProductDetails
-            title={cardInfo?.title || 'Название товара'}
+            title={productData.title}
             characteristics={cardInfo?.characteristics?.flat() || []}
             onCopy={handleCopy}
             nodeId={cardInfo?.nodeId || null}
@@ -170,29 +185,48 @@ export const PreviewCard = () => {
           <ShareButton url={currentUrl} title={cardInfo?.title || 'Без названия'} />
 
           {/* Блок с ценой и корзиной */}
-          <div className="ml-[5%] w-[280px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
-            {/* Цена */}
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-accent-100">
-                {productData.price !== undefined && productData.price > 0
-                  ? `${productData.price} ${cardInfo?.priceRub !== null ? '₽' : 'Br'}`
-                  : 'цена не указана'}
-              </span>
-            </div>
-            {/* Скидка */}
-            <div className="flex items-center bg-discount/10 text-discount rounded-lg px-4 py-2 mt-4 text-lg font-semibold mb-[25px]"></div>
-            {/* Кнопка в корзину */}
-            {isInCart ? (
-              <Button disabled fullWidth>
-                В корзине
-              </Button>
+          <div className="ml-[5%] w-[300px] h-fit shadow-lg rounded-xl p-6 bg-bg-primary border border-border-primary self-start">
+            {basePrice != null ? (
+              <>
+                {/* Цена и старая цена */}
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-accent-100">
+                    {discountedPrice != null
+                      ? discountedPrice.toLocaleString('ru-RU', { minimumFractionDigits: 2 })
+                      : basePrice.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}{' '}
+                    {symbol}
+                  </span>
+
+                  {sale != null && (
+                    <span className="text-sm text-gray-500 line-through">
+                      {basePrice.toLocaleString('ru-RU', { minimumFractionDigits: 2 })}{' '}
+                      <span className="text-text-secondary">{symbol}</span>
+                    </span>
+                  )}
+                </div>
+
+                {/* Блок с экономией */}
+                {savedAmount != null && (
+                  <div className="flex items-center bg-discount/10 text-discount rounded-lg px-4 py-2 mt-4 text-lg font-semibold mb-[25px]">
+                    <span className="mr-1">▲</span>
+                    {savedAmount.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} {symbol}
+                  </div>
+                )}
+
+                {/* Кнопка в корзину */}
+                {isInCart ? (
+                  <Button disabled fullWidth>
+                    В корзине
+                  </Button>
+                ) : (
+                  <Button className="gap-2 text-white text-base" fullWidth onClick={addToCart}>
+                    <BsCart2 /> В корзину
+                  </Button>
+                )}
+              </>
             ) : (
-              <Button className={'gap-2 text-white text-base'} fullWidth onClick={addToCart}>
-                <span>
-                  <BsCart2 />
-                </span>{' '}
-                В корзину
-              </Button>
+              // Цена не задана
+              <div className="text-lg text-text-secondary">Цена не указана</div>
             )}
           </div>
         </div>

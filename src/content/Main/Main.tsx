@@ -1,4 +1,11 @@
-import { useGetAllCardsQuery, useGetAllFiltersQuery, useGetAllNodeTypesQuery } from '@/app/api'
+import {
+  CardItem,
+  useGetAllCardsQuery,
+  useGetAllFiltersQuery,
+  useGetAllNodeTypesQuery,
+} from '@/app/api'
+import { RootState } from '@/app/store'
+import { noImage } from '@/assets'
 import {
   Button,
   Card,
@@ -17,10 +24,8 @@ import {
   AccordionTrigger,
 } from '@radix-ui/react-accordion'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/app/store'
-import { noImage } from '@/assets'
 
 type Filter = {
   characteristicId: number
@@ -45,9 +50,11 @@ const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps
   }, [])
 
   const handleCheckboxChange = (key: string, value: string) => {
-    setSelectedFilters(prev => {
+    setSelectedFilters((prev: Record<string, string[]>) => {
       const vals = prev[key] || []
-      const nextVals = vals.includes(value) ? vals.filter(v => v !== value) : [...vals, value]
+      const nextVals = vals.includes(value)
+        ? vals.filter((v: string) => v !== value)
+        : [...vals, value]
       const next = { ...prev }
       if (nextVals.length) next[key] = nextVals
       else delete next[key]
@@ -131,6 +138,25 @@ const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps
   )
 }
 
+const CardWrapper = ({ card }: { card: CardItem }) => {
+  return (
+    <Card
+      key={card.nodeId}
+      product={{
+        image: String(card.images[0] || noImage),
+        price: 0,
+        title: card.title,
+        description: card.nodeDescription || '',
+        rating: { rate: 4.5, count: 10 },
+        id: card.nodeId,
+        priceByn: card.priceByn,
+        priceRub: card.priceRub,
+        sale: card.sale,
+      }}
+    />
+  )
+}
+
 export const Main = () => {
   const handleError = useErrorHandler()
   const searchResults = useSelector((state: RootState) => state.search.results)
@@ -161,7 +187,7 @@ export const Main = () => {
     },
     { refetchOnMountOrArgChange: true }
   )
-
+  console.log(allCardsData)
   const { data: allFiltersData, isLoading: filtersLoading } = useGetAllFiltersQuery({
     nodeTypeId: selectedNodeTypeId ?? undefined,
   })
@@ -250,7 +276,7 @@ export const Main = () => {
             <Card
               key={card.nodeId}
               product={{
-                image: card.images[0] || noImage,
+                image: card.images[0] || noImage.src,
                 price: card.priceByn || card.priceRub || 0,
                 title: card.title,
                 description: card.nodeDescription || '',
@@ -258,6 +284,7 @@ export const Main = () => {
                 id: card.nodeId,
                 priceByn: card.priceByn,
                 priceRub: card.priceRub,
+                sale: card.sale,
               }}
             />
           ))}
@@ -280,19 +307,7 @@ export const Main = () => {
     return (
       <div className="flex flex-wrap justify-center">
         {displayedCards.map(card => (
-          <Card
-            key={card.nodeId}
-            product={{
-              image: card.images[0] || noImage,
-              price: card.priceRub || card.priceByn || 0,
-              title: card.title,
-              description: card.nodeDescription || '',
-              rating: { rate: 4.5, count: 10 },
-              id: card.nodeId,
-              priceByn: card.priceByn,
-              priceRub: card.priceRub,
-            }}
-          />
+          <CardWrapper key={card.nodeId} card={card} />
         ))}
       </div>
     )

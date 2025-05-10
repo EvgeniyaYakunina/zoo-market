@@ -28,7 +28,6 @@ export const ProductDetails = ({ title, characteristics, onCopy, nodeId }: Produ
     ),
   ]
   const sizes = characteristics.filter(char => char.title.toLowerCase() === 'размер')
-  console.log(sizes)
 
   return (
     <div className="flex flex-col w-auto">
@@ -42,25 +41,29 @@ export const ProductDetails = ({ title, characteristics, onCopy, nodeId }: Produ
             <h3 className="mb-2 text-text-tertiary">Характеристики:</h3>
             <SizeTable sizes={sizes} />
             <ul className="text-text-primary space-y-2">
-              {details.map((char, index) => (
-                <li
-                  key={index}
-                  className="p-2 border border-bg-secondary rounded-md flex justify-between items-center"
-                >
-                  <div>
-                    <div className="flex items-center gap-2 relative">
-                      {char.value && (
-                        <div className="relative inline-block group">
-                          <AiFillQuestionCircle
-                            className="text-text-tertiary cursor-pointer"
-                            aria-label="Показать подсказку"
-                          />
-                          <div className="absolute bottom-full left-1/2 -translate-x-1 mb-2 w-48 p-2 bg-bg-secondary text-sm text-text-primary rounded-md shadow-lg opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 z-10 ">
-                            <div>{char.value}</div>
-                            <div>{char.description}</div>
-                            <div>
+              {details.map((char, index) => {
+                const hasHint =
+                  (char.description || char.additionalParams) &&
+                  char.title.toLowerCase() !== 'артикул'
+
+                return (
+                  <li
+                    key={index}
+                    className="p-2 border border-bg-secondary rounded-md flex justify-between items-center"
+                  >
+                    <div>
+                      <div className="flex items-center gap-2">
+                        {hasHint && (
+                          <div className="relative inline-block group">
+                            <AiFillQuestionCircle
+                              className="text-text-tertiary cursor-pointer"
+                              aria-label="Показать подсказку"
+                            />
+                            <div className="absolute bottom-full left-1/2 -translate-x-1 mb-2 w-48 p-2 bg-bg-secondary text-sm text-text-primary rounded-md shadow-lg opacity-0 pointer-events-none transition-opacity group-hover:opacity-100 z-10">
+                              <div>{char.value}</div>
+                              {char.description && <div>{char.description}</div>}
                               {char.additionalParams && (
-                                <div>
+                                <div className="mt-1">
                                   {Object.entries(char.additionalParams).map(([key, value]) => (
                                     <div key={key}>{`${key}: ${String(value)}`}</div>
                                   ))}
@@ -68,28 +71,29 @@ export const ProductDetails = ({ title, characteristics, onCopy, nodeId }: Produ
                               )}
                             </div>
                           </div>
-                        </div>
+                        )}
+
+                        <span className="text-text-tertiary">{char.title}:</span>
+                        <span>{char.value}</span>
+                      </div>
+
+                      {char.description && !hasHint && (
+                        <p className="text-text-tertiary text-sm mt-1">{char.description}</p>
                       )}
-                      <span className="text-text-tertiary ">{char.title}:</span>
-                      <span>{char.value}</span>
                     </div>
 
-                    {char.description && (
-                      <p className="text-text-tertiary text-sm mt-1">{char.description}</p>
+                    {char.title.toLowerCase() === 'артикул' && (
+                      <button
+                        onClick={() => onCopy(char.value)}
+                        className="ml-2 text-text-secondary hover:text-text-primary"
+                        aria-label="Скопировать артикул"
+                      >
+                        <FiCopy />
+                      </button>
                     )}
-                  </div>
-
-                  {char.title === 'артикул' && (
-                    <button
-                      onClick={() => onCopy(char.value)}
-                      className="ml-2 text-text-secondary hover:text-text-primary"
-                      aria-label="Скопировать артикул"
-                    >
-                      <FiCopy />
-                    </button>
-                  )}
-                </li>
-              ))}
+                  </li>
+                )
+              })}
             </ul>
           </div>
         )}
