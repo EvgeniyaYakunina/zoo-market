@@ -24,7 +24,7 @@ import {
   AccordionTrigger,
 } from '@radix-ui/react-accordion'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 
 type Filter = {
@@ -171,8 +171,6 @@ export const Main = () => {
   const [selectedCharacteristics, setSelectedCharacteristics] = useState<Record<string, string[]>>(
     {}
   )
-  const [filtersApplied, setFiltersApplied] = useState(false)
-  const [dynamicFilters, setDynamicFilters] = useState<Filter[]>([])
 
   const {
     data: allCardsData,
@@ -183,58 +181,17 @@ export const Main = () => {
       pageNumber: 1,
       pageSize: 1000,
       nodeTypeId: selectedNodeTypeId ?? undefined,
-      filters: {},
+      filters: selectedCharacteristics,
     },
     { refetchOnMountOrArgChange: true }
   )
-  console.log(allCardsData)
+
   const { data: allFiltersData, isLoading: filtersLoading } = useGetAllFiltersQuery({
     nodeTypeId: selectedNodeTypeId ?? undefined,
   })
 
-  useEffect(() => {
-    if (!allFiltersData || !allCardsData?.items) {
-      setDynamicFilters([])
-      return
-    }
-
-    const presentMap: Record<number, Set<string>> = {}
-
-    allCardsData.items.forEach(card =>
-      card.characteristics.flat().forEach(({ title, value }) => {
-        const master = allFiltersData.find(f => f.title === title)
-        if (!master) return
-        const id = master.characteristicId
-        if (!presentMap[id]) presentMap[id] = new Set()
-        presentMap[id].add(value)
-      })
-    )
-
-    const newFilters: Filter[] = allFiltersData
-      .filter(f => presentMap[f.characteristicId]?.size > 0)
-      .map(f => ({
-        characteristicId: f.characteristicId,
-        title: f.title,
-        values: Array.from(presentMap[f.characteristicId]),
-      }))
-
-    setDynamicFilters(newFilters)
-    setSelectedCharacteristics({})
-    setFiltersApplied(false)
-  }, [allFiltersData, allCardsData])
-
-  const displayedCards = useMemo(() => {
-    if (!filtersApplied || !allCardsData?.items) {
-      return allCardsData?.items || []
-    }
-    return allCardsData.items.filter(card =>
-      Object.entries(selectedCharacteristics).every(([key, values]) => {
-        const group = card.characteristics.find(g => g[0]?.title === key)
-        if (!group) return false
-        return group.some(item => values.includes(item.value))
-      })
-    )
-  }, [allCardsData, selectedCharacteristics, filtersApplied])
+  const displayedCards =
+    searchResults && searchResults.length > 0 ? searchResults : (allCardsData?.items ?? [])
 
   useEffect(() => {
     if (nodeTypesError) handleError(nodeTypesError)
@@ -245,7 +202,6 @@ export const Main = () => {
     const resetHandler = () => {
       setSelectedNodeTypeId(null)
       setSelectedCharacteristics({})
-      setFiltersApplied(false)
     }
     window.addEventListener('resetFilters', resetHandler)
     return () => window.removeEventListener('resetFilters', resetHandler)
@@ -253,11 +209,11 @@ export const Main = () => {
 
   const handleApplyFilters = (filters: Record<string, string[]>) => {
     setSelectedCharacteristics(filters)
-    setFiltersApplied(Object.keys(filters).length > 0)
   }
 
   const handleCategoryChange = (id: number) => {
     setSelectedNodeTypeId(id)
+    setSelectedCharacteristics({})
   }
 
   const renderContent = () => {
@@ -339,7 +295,7 @@ export const Main = () => {
         <div className="flex w-full min-h-screen">
           <Sidebar
             onApplyFilters={handleApplyFilters}
-            filters={dynamicFilters}
+            filters={allFiltersData}
             isLoading={allCardsLoading || filtersLoading}
             key={selectedNodeTypeId || 'all'}
           />
