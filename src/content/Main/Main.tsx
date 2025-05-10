@@ -151,6 +151,7 @@ const CardWrapper = ({ card }: { card: CardItem }) => {
         id: card.nodeId,
         priceByn: card.priceByn,
         priceRub: card.priceRub,
+        sale: card.sale,
       }}
     />
   )

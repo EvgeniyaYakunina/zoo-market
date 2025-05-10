@@ -178,6 +178,7 @@ export type CardItem = Omit<Node, 'id' | 'nodeTypeId' | 'description'> & {
   characteristics: CharacteristicResponse[][]
   priceByn: number | null
   priceRub: number | null
+  sale: number | null
 }
 
 // Новый тип для ответа getAllCards
