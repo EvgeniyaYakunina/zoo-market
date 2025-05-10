@@ -1,4 +1,11 @@
-import { useGetAllCardsQuery, useGetAllFiltersQuery, useGetAllNodeTypesQuery } from '@/app/api'
+import {
+  CardItem,
+  useGetAllCardsQuery,
+  useGetAllFiltersQuery,
+  useGetAllNodeTypesQuery,
+} from '@/app/api'
+import { RootState } from '@/app/store'
+import { noImage } from '@/assets'
 import {
   Button,
   Card,
@@ -17,10 +24,8 @@ import {
   AccordionTrigger,
 } from '@radix-ui/react-accordion'
 import { ChevronDownIcon } from '@radix-ui/react-icons'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/app/store'
-import { noImage } from '@/assets'
 
 type Filter = {
   characteristicId: number
@@ -133,13 +138,22 @@ const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps
   )
 }
 
-type CardType = {
-  nodeId: number
-  images: string[]
-  priceByn: number | null
-  priceRub: number | null
-  title: string
-  nodeDescription?: string
+const CardWrapper = ({ card }: { card: CardItem }) => {
+  return (
+    <Card
+      key={card.nodeId}
+      product={{
+        image: String(card.images[0] || noImage),
+        price: 0,
+        title: card.title,
+        description: card.nodeDescription || '',
+        rating: { rate: 4.5, count: 10 },
+        id: card.nodeId,
+        priceByn: card.priceByn,
+        priceRub: card.priceRub,
+      }}
+    />
+  )
 }
 
 export const Main = () => {
@@ -172,7 +186,7 @@ export const Main = () => {
     },
     { refetchOnMountOrArgChange: true }
   )
-
+  console.log(allCardsData)
   const { data: allFiltersData, isLoading: filtersLoading } = useGetAllFiltersQuery({
     nodeTypeId: selectedNodeTypeId ?? undefined,
   })
@@ -290,20 +304,8 @@ export const Main = () => {
 
     return (
       <div className="flex flex-wrap justify-center">
-        {displayedCards.map((card: CardType) => (
-          <Card
-            key={card.nodeId}
-            product={{
-              image: card.images[0] || noImage,
-              price: card.priceRub || card.priceByn || 0,
-              title: card.title,
-              description: card.nodeDescription || '',
-              rating: { rate: 4.5, count: 10 },
-              id: card.nodeId,
-              priceByn: card.priceByn,
-              priceRub: card.priceRub,
-            }}
-          />
+        {displayedCards.map(card => (
+          <CardWrapper key={card.nodeId} card={card} />
         ))}
       </div>
     )

@@ -1,32 +1,48 @@
-import Image, { StaticImageData } from 'next/image'
+import Image from 'next/image'
 import { BsCart2 } from 'react-icons/bs'
 import { Button } from '../ui'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { noImage } from '@/assets'
 import { useCart, useIsOverflow } from '@/hooks'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/store'
+
+type Product = {
+  id: number
+  image: string
+  price: number
+  title: string
+  description: string
+  rating: {
+    rate: number
+    count: number
+  }
+  priceByn: number | null
+  priceRub: number | null
+}
+
+type CardProps = {
+  product: Product
+}
 
 //TODO: maybe change
-export type ProductItemProps = {
-  product: {
-    image: string | StaticImageData
-    price: number
-    title: string
-    description: string
-    rating?: {
-      rate: number
-      count: number
-    }
-    id: number
-    priceByn: number | null
-    priceRub: number | null
-  }
-}
-export const Card = ({ product }: ProductItemProps) => {
-  const { image, price, title, description, id, priceRub } = product
-  const roundPrice = Math.floor(price)
+export const Card = ({ product }: CardProps) => {
+  const { image, title, description, id, priceByn, priceRub } = product
+  const currency = useSelector((state: RootState) => state.currency.value)
   const router = useRouter()
-  const { isInCart, addToCart } = useCart(id, { image, price, title, description, id })
+
+  // Определяем цену в зависимости от выбранной валюты
+  const price = currency === 'BYN' ? priceByn : priceRub
+  const currencySymbol = currency === 'BYN' ? 'BYN' : '₽'
+
+  const { isInCart, addToCart } = useCart(id, {
+    image,
+    price: price || 0,
+    title,
+    description,
+    id,
+  })
   const [titleRef, isOverflow] = useIsOverflow(title)
 
   const handleClickCard = () => {
@@ -36,11 +52,11 @@ export const Card = ({ product }: ProductItemProps) => {
   return (
     <div className="w-[250px] p-4 h-[450px]">
       <div className="shadow-md rounded-lg overflow-hidden transition-transform duration-200 hover:scale-105 cursor-pointer h-full flex flex-col justify-between">
-        <div onClick={handleClickCard} className="block text-inherit ">
+        <div onClick={handleClickCard} className="block text-inherit">
           {/* Изображение товара */}
           <div className="relative group">
             <Image
-              src={image ? image : noImage}
+              src={image || noImage}
               alt="product"
               width={200}
               height={200}
@@ -55,10 +71,14 @@ export const Card = ({ product }: ProductItemProps) => {
           {/* Описание товара */}
           <div className="p-4">
             <b className="text-lg font-semibold">
-              {roundPrice}
-              <span className="text-text-secondary ml-1">{priceRub ? '₽' : 'Br'}</span>
-
-              {/* <del className="text-border-secondary">{roundPrice + 570}$</del> */}
+              {price !== null ? (
+                <>
+                  {price}
+                  <span className="text-text-secondary ml-1">{currencySymbol}</span>
+                </>
+              ) : (
+                <span className="text-text-secondary">цена не указана</span>
+              )}
             </b>
             <div className="relative group">
               <p

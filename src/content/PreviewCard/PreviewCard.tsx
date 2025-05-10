@@ -1,4 +1,5 @@
 import { useGetCardByIdQuery } from '@/app/api'
+import { RootState } from '@/app/store'
 import { noImage } from '@/assets'
 import {
   Button,
@@ -17,6 +18,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { BsCart2 } from 'react-icons/bs'
 import { FaArrowLeft } from 'react-icons/fa'
+import { useSelector } from 'react-redux'
 import { FreeMode, Keyboard, Navigation, Thumbs } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
@@ -42,6 +44,10 @@ export const PreviewCard = () => {
   // For Swiper thumbnails
   const [thumbsSwiper] = useState<SwiperType | null>(null)
 
+  const currency = useSelector((state: RootState) => state.currency.value)
+  const price = currency === 'BYN' ? cardInfo?.priceByn : cardInfo?.priceRub
+  const currencySymbol = currency === 'BYN' ? 'BYN' : '₽'
+
   useEffect(() => {
     if (cardError) {
       handleError(cardError)
@@ -62,14 +68,11 @@ export const PreviewCard = () => {
   const productData = {
     id: Number(id),
     image: selectedImage || noImage,
-    price:
-      cardInfo?.priceRub !== null
-        ? cardInfo?.priceRub
-        : cardInfo?.priceByn !== null
-          ? cardInfo?.priceByn
-          : 0,
+    price: price || 0,
     title: cardInfo?.title || 'Название товара',
     description: cardInfo?.nodeDescription,
+    priceByn: cardInfo?.priceByn,
+    priceRub: cardInfo?.priceRub,
   }
   console.log('cardInfo', cardInfo)
   const { isInCart, addToCart } = useCart(Number(id), productData)
@@ -174,9 +177,13 @@ export const PreviewCard = () => {
             {/* Цена */}
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-accent-100">
-                {productData.price !== undefined && productData.price > 0
-                  ? `${productData.price} ${cardInfo?.priceRub !== null ? '₽' : 'Br'}`
-                  : 'цена не указана'}
+                {price !== null ? (
+                  <>
+                    {price} {currencySymbol}
+                  </>
+                ) : (
+                  'цена не указана'
+                )}
               </span>
             </div>
             {/* Скидка */}
