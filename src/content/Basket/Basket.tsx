@@ -1,9 +1,9 @@
-import { BasketList, Button } from '@/components'
+import { BasketList, Button, OrderModal, ResultModal } from '@/components'
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { CartItem } from '@/hooks'
-import { OrderModal, OrderFormData } from '@/components/OrderModal/OrderModal'
+import { OrderFormData } from '@/components/OrderModal/OrderModal'
 
 type BasketFormSidebarProps = {
   carts?: CartItem[]
@@ -11,6 +11,8 @@ type BasketFormSidebarProps = {
 
 function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [showResultModal, setShowResultModal] = useState(false)
+  const [orderSuccess, setOrderSuccess] = useState(false)
 
   // 1) Общее количество штук
   const totalItems = useMemo(
@@ -48,13 +50,21 @@ function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
   const discountLabel = totalDiscount > 0 ? `-${fmt(totalDiscount)}` : fmt(0)
 
   const handleOrderSubmit = (formData: OrderFormData) => {
-    // Здесь будет логика отправки заказа на сервер
+    // TODO: Replace with real API call
     console.log('Order data:', {
       ...formData,
       items: carts,
       totalAmount: totalDiscounted,
     })
-    setIsModalOpen(false)
+  }
+
+  const handleOrderResult = (success: boolean) => {
+    setOrderSuccess(success)
+    setShowResultModal(true)
+  }
+
+  const handleResultClose = () => {
+    setShowResultModal(false)
   }
 
   return (
@@ -88,7 +98,10 @@ function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleOrderSubmit}
+        onOrderResult={handleOrderResult}
       />
+
+      {showResultModal && <ResultModal isSuccess={orderSuccess} onClose={handleResultClose} />}
     </div>
   )
 }

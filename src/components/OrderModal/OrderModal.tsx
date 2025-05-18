@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
+import { ButtonSpinner } from '../ButtonSpinner'
 
 type OrderModalProps = {
   isOpen: boolean
   onClose: () => void
   onSubmit: (formData: OrderFormData) => void
+  onOrderResult: (success: boolean) => void
 }
 
 export type OrderFormData = {
@@ -16,7 +18,18 @@ export type OrderFormData = {
   comment?: string
 }
 
-export const OrderModal = ({ isOpen, onClose, onSubmit }: OrderModalProps) => {
+// TODO: Replace with real API call when backend is ready
+const fakeSubmitOrder = (formData: OrderFormData): Promise<boolean> => {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      // For testing: returns success if email contains 'success', failure otherwise
+      resolve(formData.email.includes('success'))
+    }, 2000)
+  })
+}
+
+export const OrderModal = ({ isOpen, onClose, onSubmit, onOrderResult }: OrderModalProps) => {
+  const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState<OrderFormData>({
     phone: '',
     fullName: '',
@@ -68,10 +81,21 @@ export const OrderModal = ({ isOpen, onClose, onSubmit }: OrderModalProps) => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
-      onSubmit(formData)
+      setIsLoading(true)
+      try {
+        // TODO: Replace with real API call
+        const success = await fakeSubmitOrder(formData)
+        if (success) {
+          onSubmit(formData)
+        }
+        onClose() // Сначала закрываем форму
+        onOrderResult(success) // Передаем результат операции
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -153,14 +177,23 @@ export const OrderModal = ({ isOpen, onClose, onSubmit }: OrderModalProps) => {
               type="button"
               onClick={onClose}
               className="px-4 py-2 text-gray-600 hover:text-gray-800"
+              disabled={isLoading}
             >
               Отмена
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              disabled={isLoading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-blue-400 flex items-center gap-2"
             >
-              Отправить заказ
+              {isLoading ? (
+                <>
+                  <ButtonSpinner />
+                  <span>Отправка...</span>
+                </>
+              ) : (
+                'Отправить заказ'
+              )}
             </button>
           </div>
         </form>
