@@ -3,12 +3,15 @@ import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { CartItem } from '@/hooks'
+import { OrderModal, OrderFormData } from '@/components/OrderModal/OrderModal'
 
 type BasketFormSidebarProps = {
   carts?: CartItem[]
 }
 
 function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   // 1) Общее количество штук
   const totalItems = useMemo(
     () => carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0),
@@ -44,6 +47,16 @@ function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
   // Если скидки нет, покажем 0, иначе – с минусом
   const discountLabel = totalDiscount > 0 ? `-${fmt(totalDiscount)}` : fmt(0)
 
+  const handleOrderSubmit = (formData: OrderFormData) => {
+    // Здесь будет логика отправки заказа на сервер
+    console.log('Order data:', {
+      ...formData,
+      items: carts,
+      totalAmount: totalDiscounted,
+    })
+    setIsModalOpen(false)
+  }
+
   return (
     <div className="w-full lg:w-[360px]">
       <div className="bg-white rounded-2xl shadow-sm">
@@ -65,9 +78,17 @@ function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
           </div>
 
           {/* Кнопка */}
-          <Button fullWidth>Отправить заявку</Button>
+          <Button fullWidth onClick={() => setIsModalOpen(true)}>
+            Отправить заявку
+          </Button>
         </div>
       </div>
+
+      <OrderModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={handleOrderSubmit}
+      />
     </div>
   )
 }
