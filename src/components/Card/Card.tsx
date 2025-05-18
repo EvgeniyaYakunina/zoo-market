@@ -44,6 +44,8 @@ export const Card = ({ product }: CardProps) => {
   const { isInCart, addToCart } = useCart(id, {
     image,
     price: discountedPrice ?? basePrice ?? 0,
+    originalPrice: basePrice ?? undefined,
+    sale,
     title,
     description,
     id,

@@ -4,7 +4,12 @@ import { StaticImageData } from 'next/image'
 export type CartItem = {
   id: number
   image: string | StaticImageData
+  // final price with discount applied
   price: number | undefined
+  // original price before discount
+  originalPrice?: number
+  // discount percentage (0-100)
+  sale?: number | null
   title: string
   description: string | null | undefined
   quantity: number

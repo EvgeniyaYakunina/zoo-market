@@ -82,6 +82,8 @@ export const PreviewCard = () => {
     id: Number(id),
     image: selectedImage || noImage,
     price: discountedPrice || 0,
+    originalPrice: basePrice ?? undefined,
+    sale,
     title: cardInfo?.title || 'Название товара',
     description: cardInfo?.nodeDescription,
     priceByn: cardInfo?.priceByn,
