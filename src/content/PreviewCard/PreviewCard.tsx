@@ -61,6 +61,15 @@ export const PreviewCard = () => {
   //   basePrice != null && discountedPrice != null ? +(basePrice -
   //   discountedPrice).toFixed(2) : null
 
+  // Extract sizes from characteristics if they exist
+  const availableSizes =
+    cardInfo?.characteristics
+      ?.find(char => char.some(c => c.title.toLowerCase() === 'размер'))
+      ?.map(size => ({
+        value: size.value,
+        quantity: Number(size.additionalParams?.['количество']) || 0,
+      })) || []
+
   useEffect(() => {
     if (cardError) {
       handleError(cardError)
@@ -88,6 +97,7 @@ export const PreviewCard = () => {
     description: cardInfo?.nodeDescription,
     priceByn: cardInfo?.priceByn,
     priceRub: cardInfo?.priceRub,
+    availableSizes: availableSizes.length > 0 ? availableSizes : undefined,
   }
   console.log('cardInfo', cardInfo)
   const { isInCart, addToCart } = useCart(Number(id), productData)
@@ -207,14 +217,6 @@ export const PreviewCard = () => {
                     </span>
                   )}
                 </div>
-
-                {/* Блок с экономией */}
-                {/* {savedAmount != null && (
-                  <div className="flex items-center bg-discount/10 text-discount rounded-lg px-4 py-2 mt-4 text-lg font-semibold mb-[25px]">
-                    <span className="mr-1">▲</span>
-                    {savedAmount.toLocaleString('ru-RU', { minimumFractionDigits: 2 })} {symbol}
-                  </div>
-                )} */}
 
                 {/* Кнопка в корзину */}
                 {isInCart ? (

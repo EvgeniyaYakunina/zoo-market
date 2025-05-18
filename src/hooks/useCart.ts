@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react'
 import { StaticImageData } from 'next/image'
 
+export type Size = {
+  value: string
+  quantity: number
+}
+
 export type CartItem = {
   id: number
   image: string | StaticImageData
@@ -13,6 +18,7 @@ export type CartItem = {
   title: string
   description: string | null | undefined
   quantity: number
+  availableSizes?: Size[]
 }
 
 export const useCart = (productId: number, productData?: Omit<CartItem, 'quantity'>) => {
