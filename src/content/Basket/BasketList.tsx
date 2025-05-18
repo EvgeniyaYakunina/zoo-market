@@ -2,19 +2,7 @@ import { useState } from 'react'
 import { MdOutlineDeleteOutline } from 'react-icons/md'
 import Image from 'next/image'
 import { noImage } from '@/assets'
-
-export type CartItem = {
-  image: string
-  price: number
-  title: string
-  description: string
-  rating: {
-    rate: number
-    count: number
-  }
-  id: number
-  quantity?: number
-}
+import { CartItem } from '@/hooks'
 
 export type CartProps = {
   cart: CartItem
@@ -110,9 +98,9 @@ function BasketItem({ cart, setCarts }: CartProps) {
       <div className="w-[195px] text-right">
         <div className="all_price_basket_product">
           <h3 className="text-lg leading-6">{roundPrice * value} $</h3>
-          <del className="text-sm leading-5 mt-1 text-text-muted font-normal">
+          {/* <del className="text-sm leading-5 mt-1 text-text-muted font-normal">
             {(roundPrice + 570) * value} $
-          </del>
+          </del> */}
         </div>
 
         <div className="mt-4">

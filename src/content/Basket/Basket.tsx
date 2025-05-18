@@ -1,34 +1,71 @@
-import { BasketList, Button, CartItem } from '@/components'
-import { useEffect, useState } from 'react'
+import { BasketList, Button } from '@/components'
+import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
+import { CartItem } from '@/hooks'
 
-function BasketFormSidebar({ carts = [] }: { carts?: CartItem[] }) {
-  const totalItems = carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0)
-  const finalPrice = carts.reduce(
-    (sum, cart) => sum + Math.floor(cart.price) * (cart.quantity || 1),
-    0
+type BasketFormSidebarProps = {
+  carts?: CartItem[]
+}
+
+function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
+  // 1) Общее количество штук
+  const totalItems = useMemo(
+    () => carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0),
+    [carts]
   )
+
+  // 2) Сумма до скидки: если есть originalPrice — берём его, иначе price
+  const totalOriginal = useMemo(
+    () =>
+      carts.reduce((sum, cart) => {
+        const orig = cart.originalPrice !== undefined ? cart.originalPrice : cart.price
+        return sum + (orig !== undefined ? orig * (cart.quantity || 1) : 0)
+      }, 0),
+    [carts]
+  )
+
+  // 3) Сумма со скидкой
+  const totalDiscounted = useMemo(
+    () => carts.reduce((sum, cart) => sum + (cart.price ?? 0) * (cart.quantity || 1), 0),
+    [carts]
+  )
+
+  // 4) Ваша экономия
+  const totalDiscount = totalOriginal - totalDiscounted
+
+  // Форматируем число «1 234,56»
+  const fmt = (value: number) =>
+    value.toLocaleString('ru-RU', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+
+  // Если скидки нет, покажем 0, иначе – с минусом
+  const discountLabel = totalDiscount > 0 ? `-${fmt(totalDiscount)}` : fmt(0)
 
   return (
     <div className="w-full lg:w-[360px]">
-      <div className="bg-white rounded-2xl">
+      <div className="bg-white rounded-2xl shadow-sm">
         <div className="p-6">
-          <div className="mb-4">
-            <p className="flex justify-between">
-              <span className="text-sm text-text-muted mb-2">
-                Товары, <span>{totalItems} шт</span>
-              </span>
-              <span className="text-sm text-text-primary mb-2">{finalPrice} $</span>
-            </p>
-
-            <div className="flex justify-between">
-              <h2 className="text-2xl leading-8">Итог</h2>
-              <h2 className="text-2xl leading-8">{finalPrice} $</h2>
+          {/* Сводка по корзине */}
+          <div className="mb-6">
+            <div className="flex justify-between mb-1 text-sm text-text-primary">
+              <span>Товары, {totalItems} шт.</span>
+              <span>{fmt(totalOriginal)} р.</span>
+            </div>
+            <div className="flex justify-between mb-4 text-sm text-discount">
+              <span>Моя скидка</span>
+              <span>{discountLabel} р.</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-2xl font-bold">Итого</span>
+              <span className="text-2xl font-bold">{fmt(totalDiscounted)} р.</span>
             </div>
           </div>
 
-          <Button fullWidth>Заказать</Button>
+          {/* Кнопка */}
+          <Button fullWidth>Отправить заявку</Button>
         </div>
       </div>
     </div>
