@@ -1,117 +1,154 @@
-import { useState } from 'react'
-import { MdOutlineDeleteOutline } from 'react-icons/md'
-import Image from 'next/image'
 import { noImage } from '@/assets'
 import { CartItem } from '@/hooks'
+import Image from 'next/image'
+import { useState } from 'react'
+import { MdOutlineDeleteOutline } from 'react-icons/md'
 
 export type CartProps = {
   cart: CartItem
   setCarts: (carts: CartItem[]) => void
   carts: CartItem[]
 }
-function BasketItem({ cart, setCarts }: CartProps) {
-  const { image, price, title } = cart
-  const roundPrice = Math.floor(price)
-  const [value, setValue] = useState(cart.quantity || 1)
 
-  const updateCartItemQuantity = (newQuantity: number) => {
+type SizeQuantity = {
+  [key: string]: number
+}
+
+function BasketItem({ cart, setCarts }: CartProps) {
+  const { price, availableSizes } = cart
+  const roundPrice = Math.floor(price || 0)
+
+  // Состояние для количества
+  const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity>(() => {
+    if (!availableSizes) {
+      return { default: cart.quantity || 1 }
+    }
+    return availableSizes.reduce((acc, size) => {
+      acc[size.value] = 0
+      return acc
+    }, {} as SizeQuantity)
+  })
+
+  const totalQuantity = availableSizes
+    ? Object.values(sizeQuantities).reduce((sum, qty) => sum + qty, 0)
+    : sizeQuantities.default
+
+  const updateCartItemQuantity = (newQuantities: SizeQuantity) => {
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
     const updatedCarts = storedCart.map((item: CartItem) =>
-      item.id === cart.id ? { ...item, quantity: newQuantity } : item
+      item.id === cart.id
+        ? {
+            ...item,
+            quantity: Object.values(newQuantities).reduce((sum, qty) => sum + qty, 0),
+            sizeQuantities: newQuantities,
+          }
+        : item
     )
     localStorage.setItem('cart', JSON.stringify(updatedCarts))
-    setCarts(updatedCarts) // Обновляем состояние корзины
-    window.dispatchEvent(new Event('cartUpdated')) // Обновляем Header
+    setCarts(updatedCarts)
+    window.dispatchEvent(new Event('cartUpdated'))
   }
 
-  const decrement = () => {
-    if (value > 1) {
-      const newQuantity = value - 1
-      setValue(newQuantity)
-      updateCartItemQuantity(newQuantity)
+  // Общие классы для кнопок
+  const btnCls = `
+    w-6 h-6 flex items-center justify-center
+    border-none rounded-lg bg-border-primary/20
+    text-sm cursor-pointer hover:bg-[#d7d7dd]
+  `
+    .trim()
+    .replace(/\s+/g, ' ')
+
+  const valCls = 'w-6 text-center'
+
+  const incrementSize = (size: string) => {
+    const maxQ = availableSizes?.find(s => s.value === size)?.quantity || 99
+    if (sizeQuantities[size] < maxQ) {
+      const updated = { ...sizeQuantities, [size]: sizeQuantities[size] + 1 }
+      setSizeQuantities(updated)
+      updateCartItemQuantity(updated)
+    }
+  }
+
+  const decrementSize = (size: string) => {
+    if (sizeQuantities[size] > 0) {
+      const updated = { ...sizeQuantities, [size]: sizeQuantities[size] - 1 }
+      setSizeQuantities(updated)
+      updateCartItemQuantity(updated)
     }
   }
 
   const increment = () => {
-    if (value < 99) {
-      const newQuantity = value + 1
-      setValue(newQuantity)
-      updateCartItemQuantity(newQuantity)
+    const updated = { default: sizeQuantities.default + 1 }
+    setSizeQuantities(updated)
+    updateCartItemQuantity(updated)
+  }
+
+  const decrement = () => {
+    if (sizeQuantities.default > 1) {
+      const updated = { default: sizeQuantities.default - 1 }
+      setSizeQuantities(updated)
+      updateCartItemQuantity(updated)
     }
   }
 
   const deleteCartItem = () => {
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
-    const updatedCarts = storedCart.filter((item: CartItem) => item.id !== cart.id)
-    localStorage.setItem('cart', JSON.stringify(updatedCarts))
-    setCarts(updatedCarts)
-    window.dispatchEvent(new Event('cartUpdated')) // Обновляем Header
+    const filtered = storedCart.filter((item: CartItem) => item.id !== cart.id)
+    localStorage.setItem('cart', JSON.stringify(filtered))
+    setCarts(filtered)
+    window.dispatchEvent(new Event('cartUpdated'))
   }
 
   return (
-    <div className="flex justify-between mt-4">
-      <div className="flex justify-between w-full max-w-full lg:max-w-[calc(100%-195px)]">
-        <div className="flex max-w-[560px] w-full cursor-pointer">
-          <div>
-            {image ? (
-              <Image src={image} alt={title} width={96} height={128} className="rounded-2xl mr-5" />
-            ) : (
-              <Image
-                src={noImage}
-                alt={'noImage'}
-                width={96}
-                height={128}
-                className="rounded-2xl mr-5"
-              />
-            )}
-          </div>
-          <div className="flex flex-col">
-            <div className="text-text-primary break-words">{title}</div>
-          </div>
-        </div>
-
-        <div className="w-[180px] mt-2 lg:mt-0">
-          <button
-            onClick={decrement}
-            type="button"
-            className="w-8 h-8 border-none rounded-lg bg-border-primary/20 text-lg cursor-pointer hover:bg-[#d7d7dd]"
-          >
-            -
-          </button>
-          <input
-            onChange={e => setValue(Number(e.target.value))}
-            value={value}
-            type="number"
-            className="w-8 h-8 p-0 rounded-none text-center border-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            readOnly
-          />
-          <button
-            onClick={increment}
-            type="button"
-            className="w-8 h-8 border-none rounded-lg bg-border-primary/20 text-lg cursor-pointer hover:bg-[#d7d7dd]"
-          >
-            +
-          </button>
-        </div>
+    <div className="flex items-center justify-between mt-4">
+      {/* 1) Изображение + название */}
+      <div className="flex items-center flex-1 min-w-0">
+        <Image
+          src={cart.image || noImage}
+          alt={cart.title}
+          width={96}
+          height={128}
+          className="rounded-2xl mr-5 flex-shrink-0"
+        />
+        <div className="text-text-primary truncate">{cart.title}</div>
       </div>
 
-      <div className="w-[195px] text-right">
-        <div className="all_price_basket_product">
-          <h3 className="text-lg leading-6">{roundPrice * value} $</h3>
-          {/* <del className="text-sm leading-5 mt-1 text-text-muted font-normal">
-            {(roundPrice + 570) * value} $
-          </del> */}
-        </div>
+      {/* 2) Количественные контролы */}
+      <div className="flex items-center flex-1 justify-center space-x-8">
+        {cart.availableSizes ? (
+          cart.availableSizes.map(size => (
+            <div key={size.value} className="flex flex-col items-center">
+              <span className="text-sm mb-1">{size.value}</span>
+              <div className="flex items-center space-x-2">
+                <button onClick={() => decrementSize(size.value)} className={btnCls}>
+                  –
+                </button>
+                <span className={valCls}>{sizeQuantities[size.value] || 0}</span>
+                <button onClick={() => incrementSize(size.value)} className={btnCls}>
+                  +
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <div className="flex items-center space-x-2">
+            <button onClick={decrement} className={btnCls}>
+              –
+            </button>
+            <span className={valCls}>{sizeQuantities.default}</span>
+            <button onClick={increment} className={btnCls}>
+              +
+            </button>
+          </div>
+        )}
+      </div>
 
-        <div className="mt-4">
-          <button
-            onClick={deleteCartItem}
-            type="button"
-            className="bg-transparent border-none cursor-pointer ml-3"
-          >
-            <MdOutlineDeleteOutline className="w-6 h-6 text-text-muted" />
-          </button>
-        </div>
+      {/* 3) Цена и удаление */}
+      <div className="flex flex-col items-end flex-shrink-0 ml-8">
+        <h3 className="text-lg leading-6">{roundPrice * totalQuantity} $</h3>
+        <button onClick={deleteCartItem} className="mt-2 p-1 hover:bg-gray-100 rounded">
+          <MdOutlineDeleteOutline className="w-6 h-6 text-text-muted" />
+        </button>
       </div>
     </div>
   )
