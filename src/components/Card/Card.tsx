@@ -1,12 +1,13 @@
-import Image from 'next/image'
-import { BsCart2 } from 'react-icons/bs'
-import { Button } from '../ui'
-import { useRouter } from 'next/router'
-import { ROUTES } from '@/utils/routes'
+import { CharacteristicResponse } from '@/app/api/api.types'
+import { RootState } from '@/app/store'
 import { noImage } from '@/assets'
 import { useCart, useIsOverflow } from '@/hooks'
+import { ROUTES } from '@/utils/routes'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { BsCart2 } from 'react-icons/bs'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/app/store'
+import { Button } from '../ui'
 
 type Product = {
   id: number
@@ -21,6 +22,7 @@ type Product = {
   priceByn: number | null
   priceRub: number | null
   sale: number | null // скидка в процентах, например 70
+  characteristics: CharacteristicResponse[][]
 }
 
 type CardProps = {
@@ -28,7 +30,7 @@ type CardProps = {
 }
 
 export const Card = ({ product }: CardProps) => {
-  const { id, image, title, description, priceByn, priceRub, sale } = product
+  const { id, image, title, description, priceByn, priceRub, sale, characteristics } = product
 
   const currency = useSelector((s: RootState) => s.currency.value)
   const router = useRouter()
@@ -41,13 +43,30 @@ export const Card = ({ product }: CardProps) => {
   const discountedPrice =
     basePrice != null && sale != null ? +(basePrice * (1 - sale / 100)).toFixed(2) : null
   console.log(discountedPrice)
-  const { isInCart, addToCart } = useCart(id, {
+  const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+  const availableSizes =
+    characteristics
+      ?.find(char => char.some(c => c.title.toLowerCase() === 'размер'))
+      ?.map(size => ({
+        value: size.value,
+        quantity: Number(size.additionalParams?.['количество']) || 0,
+      }))
+      .sort((a, b) => order.indexOf(a.value) - order.indexOf(b.value)) || []
+
+  const productData = {
+    id,
     image,
     price: discountedPrice ?? basePrice ?? 0,
+    originalPrice: basePrice ?? undefined,
+    sale,
     title,
     description,
-    id,
-  })
+    priceByn: product?.priceByn,
+    priceRub: product?.priceRub,
+    availableSizes: availableSizes.length > 0 ? availableSizes : undefined,
+  }
+  const { isInCart, addToCart } = useCart(id, productData)
+
   const [titleRef, isOverflow] = useIsOverflow(title)
 
   const handleClickCard = () => {

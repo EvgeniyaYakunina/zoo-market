@@ -1,4 +1,4 @@
-import { CartItem } from '@/components'
+import { CartItem } from '@/hooks'
 import { ROUTES } from '@/utils/routes'
 import { useRouter } from 'next/router'
 import { BsCart2 } from 'react-icons/bs'

@@ -29,11 +29,13 @@
     "@radix-ui/react-tabs": "^1.1.2",
     "@reduxjs/toolkit": "^2.5.1",
     "clsx": "^2.1.1",
+    "libphonenumber-js": "^1.12.8",
     "next": "15.1.6",
     "react": "^19.1.0",
     "react-country-flag": "^3.1.0",
     "react-dom": "^19.1.0",
     "react-icons": "^5.4.0",
+    "react-phone-number-input": "^3.4.12",
     "react-redux": "^9.2.0",
     "react-toastify": "^11.0.3",
     "swiper": "^11.2.6"
