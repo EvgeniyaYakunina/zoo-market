@@ -242,6 +242,7 @@ export const Main = () => {
                 priceByn: card.priceByn,
                 priceRub: card.priceRub,
                 sale: card.sale,
+                characteristics: card.characteristics,
               }}
             />
           ))}
