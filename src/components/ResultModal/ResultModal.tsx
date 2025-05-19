@@ -1,3 +1,5 @@
+import { success, reject } from '@/assets'
+import Image from 'next/image'
 interface ResultModalProps {
   isSuccess: boolean
   onClose: () => void
@@ -7,6 +9,9 @@ export const ResultModal = ({ isSuccess, onClose }: ResultModalProps) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
       <div className="bg-white rounded-2xl p-6 w-full max-w-md text-center">
+        <>
+          {isSuccess ? <Image src={success} alt="success" /> : <Image src={reject} alt="error" />}
+        </>
         <h2 className="text-2xl font-bold mb-4">
           {isSuccess ? 'Благодарим за заказ!' : 'Что-то пошло не так'}
         </h2>
