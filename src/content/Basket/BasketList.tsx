@@ -23,10 +23,11 @@ function BasketItem({ cart, setCarts }: CartProps) {
     if (!availableSizes) {
       return { default: cart.quantity || 1 }
     }
-    return availableSizes.reduce((acc, size) => {
-      acc[size.value] = 0
+    const initialSizes = availableSizes.reduce((acc, size, index) => {
+      acc[size.value] = index === 0 ? 1 : 0
       return acc
     }, {} as SizeQuantity)
+    return initialSizes
   })
 
   const totalQuantity = availableSizes
