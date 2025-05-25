@@ -11,7 +11,7 @@ import { FiCheck } from 'react-icons/fi'
 import { GoHomeFill } from 'react-icons/go'
 import { useDispatch, useSelector } from 'react-redux'
 import ReactCountryFlag from 'react-country-flag'
-
+import { RequestsTrigger } from './RequestsTrigger'
 export const Header = () => {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
@@ -97,11 +97,11 @@ export const Header = () => {
           />
 
           {width && width >= 900 && (
-            <div className="ml-auto flex items-center space-x-4">
+            <div className="ml-auto flex items-center ">
               <SignUpAndBasket carts={carts} />
-
+              <RequestsTrigger />
               {/* currency dropdown */}
-              <div ref={curRef} className="relative">
+              <div ref={curRef} className="relative px-[1rem]">
                 <button
                   onClick={() => setOpenCur(o => !o)}
                   className="flex items-center border border-gray-200 text-black rounded-lg px-3 py-2 shadow-sm w-max"
