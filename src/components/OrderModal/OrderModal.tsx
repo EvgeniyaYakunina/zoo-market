@@ -90,8 +90,8 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, onOrderResult }: OrderMo
       try {
         const success = await fakeSubmitOrder(formData)
         if (success) {
-          onSubmit(formData)
           onClose()
+          onSubmit(formData)
           onOrderResult(true)
         } else {
           onOrderResult(false)

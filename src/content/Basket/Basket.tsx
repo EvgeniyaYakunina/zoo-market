@@ -9,6 +9,7 @@ type BasketFormSidebarProps = {
   carts: CartItem[]
   totalDiscounted: number
   setCarts: (carts: CartItem[]) => void
+  onOrderResult: (success: boolean) => void
 }
 
 const getNextOrderNumber = (): string => {
@@ -36,10 +37,13 @@ const createOrderObject = (formData: OrderFormData, carts: CartItem[], totalAmou
   status: 'new',
 })
 
-function BasketFormSidebar({ carts, totalDiscounted, setCarts }: BasketFormSidebarProps) {
+function BasketFormSidebar({
+  carts,
+  totalDiscounted,
+  setCarts,
+  onOrderResult,
+}: BasketFormSidebarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [showResultModal, setShowResultModal] = useState(false)
-  const [orderSuccess, setOrderSuccess] = useState(false)
 
   // 1) Общее количество штук
   const totalItems = useMemo(
@@ -82,13 +86,8 @@ function BasketFormSidebar({ carts, totalDiscounted, setCarts }: BasketFormSideb
     setCarts([])
     window.dispatchEvent(new Event('cartUpdated'))
 
+    onOrderResult(true)
     setIsModalOpen(false)
-    setOrderSuccess(true)
-    setShowResultModal(true)
-  }
-
-  const handleResultClose = () => {
-    setShowResultModal(false)
   }
 
   return (
@@ -122,13 +121,8 @@ function BasketFormSidebar({ carts, totalDiscounted, setCarts }: BasketFormSideb
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleOrderSubmit}
-        onOrderResult={(success: boolean) => {
-          setOrderSuccess(success)
-          setShowResultModal(true)
-        }}
+        onOrderResult={onOrderResult}
       />
-
-      {showResultModal && <ResultModal isSuccess={orderSuccess} onClose={handleResultClose} />}
     </div>
   )
 }
@@ -136,6 +130,8 @@ function BasketFormSidebar({ carts, totalDiscounted, setCarts }: BasketFormSideb
 export const Basket = () => {
   const router = useRouter()
   const [carts, setCarts] = useState<CartItem[]>([])
+  const [showResultModal, setShowResultModal] = useState(false)
+  const [orderSuccess, setOrderSuccess] = useState(false)
 
   const handleBackToMain = () => {
     router.push(ROUTES.HOME)
@@ -153,6 +149,11 @@ export const Basket = () => {
     window.addEventListener('cartUpdated', onCartUpdated)
     return () => window.removeEventListener('cartUpdated', onCartUpdated)
   }, [])
+
+  const handleOrderResult = (success: boolean) => {
+    setOrderSuccess(success)
+    setShowResultModal(true)
+  }
 
   // Calculate total discounted amount for the entire cart
   const totalDiscounted = useMemo(
@@ -182,9 +183,14 @@ export const Basket = () => {
               carts={carts}
               totalDiscounted={totalDiscounted}
               setCarts={setCarts}
+              onOrderResult={handleOrderResult}
             />
           </div>
         </div>
+      )}
+
+      {showResultModal && (
+        <ResultModal isSuccess={orderSuccess} onClose={() => setShowResultModal(false)} />
       )}
     </div>
   )
