@@ -6,13 +6,44 @@ import { CartItem } from '@/hooks'
 import { OrderFormData } from '@/components/OrderModal/OrderModal'
 
 type BasketFormSidebarProps = {
-  carts?: CartItem[]
+  carts: CartItem[]
+  totalDiscounted: number
+  setCarts: (carts: CartItem[]) => void
+  onOrderResult: (success: boolean) => void
 }
 
-function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
+const getNextOrderNumber = (): string => {
+  const datePart = new Date().toISOString().slice(0, 10).replace(/-/g, '')
+  const lastOrderNumber = localStorage.getItem('lastOrderNumber') || `${datePart}-000`
+  const [lastDate, lastSeq] = lastOrderNumber.split('-')
+  const seq = lastDate === datePart ? parseInt(lastSeq, 10) + 1 : 1
+  const nextOrderNumber = `${datePart}-${seq.toString().padStart(3, '0')}`
+  localStorage.setItem('lastOrderNumber', nextOrderNumber)
+  return nextOrderNumber
+}
+
+const createOrderObject = (formData: OrderFormData, carts: CartItem[], totalAmount: number) => ({
+  orderNumber: getNextOrderNumber(),
+  orderDate: new Date().toISOString(),
+  customer: {
+    fullName: formData.fullName,
+    phone: formData.phone,
+    email: formData.email,
+    telegram: formData.telegram || '',
+    comment: formData.comment || '',
+  },
+  items: carts.map(item => ({ ...item })),
+  totalAmount,
+  status: 'new',
+})
+
+function BasketFormSidebar({
+  carts,
+  totalDiscounted,
+  setCarts,
+  onOrderResult,
+}: BasketFormSidebarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [showResultModal, setShowResultModal] = useState(false)
-  const [orderSuccess, setOrderSuccess] = useState(false)
 
   // 1) Общее количество штук
   const totalItems = useMemo(
@@ -30,12 +61,6 @@ function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
     [carts]
   )
 
-  // 3) Сумма со скидкой
-  const totalDiscounted = useMemo(
-    () => carts.reduce((sum, cart) => sum + (cart.price ?? 0) * (cart.quantity || 1), 0),
-    [carts]
-  )
-
   // 4) Ваша экономия
   const totalDiscount = totalOriginal - totalDiscounted
 
@@ -50,21 +75,19 @@ function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
   const discountLabel = totalDiscount > 0 ? `-${fmt(totalDiscount)}` : fmt(0)
 
   const handleOrderSubmit = (formData: OrderFormData) => {
-    // TODO: Replace with real API call
-    console.log('Order data:', {
-      ...formData,
-      items: carts,
-      totalAmount: totalDiscounted,
-    })
-  }
+    const newOrder = createOrderObject(formData, carts, totalDiscounted)
 
-  const handleOrderResult = (success: boolean) => {
-    setOrderSuccess(success)
-    setShowResultModal(true)
-  }
+    const existingOrders = JSON.parse(localStorage.getItem('orderHistory') || '[]')
+    const updatedOrders = [...existingOrders, newOrder]
+    localStorage.setItem('orderHistory', JSON.stringify(updatedOrders))
 
-  const handleResultClose = () => {
-    setShowResultModal(false)
+    // Очистить корзину
+    localStorage.setItem('cart', JSON.stringify([]))
+    setCarts([])
+    window.dispatchEvent(new Event('cartUpdated'))
+
+    onOrderResult(true)
+    setIsModalOpen(false)
   }
 
   return (
@@ -98,10 +121,8 @@ function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleOrderSubmit}
-        onOrderResult={handleOrderResult}
+        onOrderResult={onOrderResult}
       />
-
-      {showResultModal && <ResultModal isSuccess={orderSuccess} onClose={handleResultClose} />}
     </div>
   )
 }
@@ -109,6 +130,9 @@ function BasketFormSidebar({ carts = [] }: BasketFormSidebarProps) {
 export const Basket = () => {
   const router = useRouter()
   const [carts, setCarts] = useState<CartItem[]>([])
+  const [showResultModal, setShowResultModal] = useState(false)
+  const [orderSuccess, setOrderSuccess] = useState(false)
+
   const handleBackToMain = () => {
     router.push(ROUTES.HOME)
   }
@@ -116,7 +140,26 @@ export const Basket = () => {
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
     setCarts(storedCart)
+
+    const onCartUpdated = () => {
+      const updatedCart = JSON.parse(localStorage.getItem('cart') || '[]')
+      setCarts(updatedCart)
+    }
+
+    window.addEventListener('cartUpdated', onCartUpdated)
+    return () => window.removeEventListener('cartUpdated', onCartUpdated)
   }, [])
+
+  const handleOrderResult = (success: boolean) => {
+    setOrderSuccess(success)
+    setShowResultModal(true)
+  }
+
+  // Calculate total discounted amount for the entire cart
+  const totalDiscounted = useMemo(
+    () => carts.reduce((sum, cart) => sum + (cart.price ?? 0) * (cart.quantity || 1), 0),
+    [carts]
+  )
 
   return (
     <div className="bg-bg-secondary/20 min-w-[20em]">
@@ -136,9 +179,18 @@ export const Basket = () => {
             <BasketList carts={carts} setCarts={setCarts} />
           </div>
           <div className="w-full lg:w-[360px]">
-            <BasketFormSidebar carts={carts} />
+            <BasketFormSidebar
+              carts={carts}
+              totalDiscounted={totalDiscounted}
+              setCarts={setCarts}
+              onOrderResult={handleOrderResult}
+            />
           </div>
         </div>
+      )}
+
+      {showResultModal && (
+        <ResultModal isSuccess={orderSuccess} onClose={() => setShowResultModal(false)} />
       )}
     </div>
   )
