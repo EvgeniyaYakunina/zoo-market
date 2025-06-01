@@ -4,4 +4,5 @@ export const ROUTES = {
   SIGN_IN: '/signIn',
   CARD: '/card',
   ADMIN: '/admin',
+  REQUESTS: '/requests',
 }

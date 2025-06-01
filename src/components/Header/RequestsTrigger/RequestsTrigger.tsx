@@ -20,11 +20,7 @@ export const RequestsTrigger = ({ label = 'заказы', className = '' }: Requ
       onClick={handleClick}
       className={`flex flex-col items-center cursor-pointer group ${className} px-[1rem]`}
     >
-      <RequestsIcon
-        width={30}
-        height={30}
-        className="text-white/60 group-hover:text-white transition-colors"
-      />
+      <RequestsIcon width={30} height={30} className={className} />
       <span className="mt-1 text-sm text-white/60 group-hover:text-white transition-colors">
         {label}
       </span>
