@@ -148,11 +148,18 @@ export const Card = ({ product }: CardProps) => {
 
         {/* Кнопка добавления в корзину */}
         <div className="p-4 pt-0">
-          {isInCart ? (
+          {basePrice == null ? (
+            // 1) Если цены нет, просто дизейблим «В корзину»
+            <Button disabled fullWidth>
+              цена не указана
+            </Button>
+          ) : isInCart ? (
+            // 2) Если товар уже в корзине, показываем «В корзине»
             <Button disabled fullWidth>
               В корзине
             </Button>
           ) : (
+            // 3) Иначе — обычная активная кнопка «В корзину»
             <Button className="gap-2 text-white text-base" fullWidth onClick={addToCart}>
               <BsCart2 />В корзину
             </Button>
