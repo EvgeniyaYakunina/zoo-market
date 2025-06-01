@@ -19,13 +19,15 @@ export type OrderFormData = {
 }
 
 // TODO: Replace with real API call when backend is ready
-const fakeSubmitOrder = (formData: OrderFormData): Promise<boolean> => {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      // For testing: returns success if email contains 'success', failure otherwise
-      resolve(formData.email.includes('success'))
-    }, 2000)
-  })
+const fakeSubmitOrder = async (_formData: OrderFormData): Promise<boolean> => {
+  try {
+    // Эмулируем отправку на сервер
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    return true // В реальном приложении здесь будет проверка ответа от сервера
+  } catch (error) {
+    console.error('Error submitting order:', error)
+    return false
+  }
 }
 
 export const OrderModal = ({ isOpen, onClose, onSubmit, onOrderResult }: OrderModalProps) => {
@@ -86,13 +88,17 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, onOrderResult }: OrderMo
     if (validateForm()) {
       setIsLoading(true)
       try {
-        // TODO: Replace with real API call
         const success = await fakeSubmitOrder(formData)
         if (success) {
           onSubmit(formData)
+          onClose()
+          onOrderResult(true)
+        } else {
+          onOrderResult(false)
         }
-        onClose() // Сначала закрываем форму
-        onOrderResult(success) // Передаем результат операции
+      } catch (error) {
+        console.error('Error submitting order:', error)
+        onOrderResult(false)
       } finally {
         setIsLoading(false)
       }
