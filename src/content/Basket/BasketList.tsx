@@ -3,6 +3,8 @@ import { CartItem } from '@/hooks'
 import Image from 'next/image'
 import { useState } from 'react'
 import { MdOutlineDeleteOutline } from 'react-icons/md'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/store'
 
 export type CartProps = {
   cart: CartItem
@@ -15,8 +17,15 @@ type SizeQuantity = {
 }
 
 function BasketItem({ cart, setCarts }: CartProps) {
-  const { price, availableSizes } = cart
-  const roundPrice = Math.floor(price || 0)
+  const { price, availableSizes, priceByn, priceRub } = cart
+
+  // Get current currency from Redux store
+  const currency = useSelector((state: RootState) => state.currency.value)
+  const symbol = currency === 'BYN' ? 'Br' : '₽'
+
+  // Calculate price based on current currency
+  const currentPrice = currency === 'BYN' ? priceByn || price || 0 : priceRub || price || 0
+  const roundPrice = Math.floor(currentPrice)
 
   // Состояние для количества
   const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity>(() => {
@@ -146,7 +155,9 @@ function BasketItem({ cart, setCarts }: CartProps) {
 
       {/* 3) Цена и удаление */}
       <div className="flex flex-col items-end flex-shrink-0 ml-8">
-        <h3 className="text-lg leading-6">{roundPrice * totalQuantity} $</h3>
+        <h3 className="text-lg leading-6">
+          {roundPrice * totalQuantity} {symbol}
+        </h3>
         <button onClick={deleteCartItem} className="mt-2 p-1 hover:bg-gray-100 rounded">
           <MdOutlineDeleteOutline className="w-6 h-6 text-text-muted" />
         </button>

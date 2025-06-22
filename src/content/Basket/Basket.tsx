@@ -4,6 +4,8 @@ import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { CartItem } from '@/hooks'
 import { OrderFormData } from '@/components/OrderModal/OrderModal'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/store'
 
 type BasketFormSidebarProps = {
   carts: CartItem[]
@@ -45,6 +47,10 @@ function BasketFormSidebar({
 }: BasketFormSidebarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  // Get current currency from Redux store
+  const currency = useSelector((state: RootState) => state.currency.value)
+  const symbol = currency === 'BYN' ? 'Br' : '₽'
+
   // 1) Общее количество штук
   const totalItems = useMemo(
     () => carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0),
@@ -55,10 +61,14 @@ function BasketFormSidebar({
   const totalOriginal = useMemo(
     () =>
       carts.reduce((sum, cart) => {
-        const orig = cart.originalPrice !== undefined ? cart.originalPrice : cart.price
+        // Calculate price based on current currency
+        const currentPrice =
+          currency === 'BYN' ? cart.priceByn || cart.price || 0 : cart.priceRub || cart.price || 0
+
+        const orig = cart.originalPrice !== undefined ? cart.originalPrice : currentPrice
         return sum + (orig !== undefined ? orig * (cart.quantity || 1) : 0)
       }, 0),
-    [carts]
+    [carts, currency]
   )
 
   // 4) Ваша экономия
@@ -98,15 +108,21 @@ function BasketFormSidebar({
           <div className="mb-6">
             <div className="flex justify-between mb-1 text-sm text-text-primary">
               <span>Товары, {totalItems} шт.</span>
-              <span>{fmt(totalOriginal)} р.</span>
+              <span>
+                {fmt(totalOriginal)} {symbol}
+              </span>
             </div>
             <div className="flex justify-between mb-4 text-sm text-discount">
               <span>Моя скидка</span>
-              <span>{discountLabel} р.</span>
+              <span>
+                {discountLabel} {symbol}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-2xl font-bold">Итого</span>
-              <span className="text-2xl font-bold">{fmt(totalDiscounted)} р.</span>
+              <span className="text-2xl font-bold">
+                {fmt(totalDiscounted)} {symbol}
+              </span>
             </div>
           </div>
 
@@ -133,6 +149,9 @@ export const Basket = () => {
   const [showResultModal, setShowResultModal] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
 
+  // Get current currency from Redux store
+  const currency = useSelector((state: RootState) => state.currency.value)
+
   const handleBackToMain = () => {
     router.push(ROUTES.HOME)
   }
@@ -155,10 +174,17 @@ export const Basket = () => {
     setShowResultModal(true)
   }
 
-  // Calculate total discounted amount for the entire cart
+  // Calculate total discounted amount for the entire cart based on current currency
   const totalDiscounted = useMemo(
-    () => carts.reduce((sum, cart) => sum + (cart.price ?? 0) * (cart.quantity || 1), 0),
-    [carts]
+    () =>
+      carts.reduce((sum, cart) => {
+        // Calculate price based on current currency
+        const currentPrice =
+          currency === 'BYN' ? cart.priceByn || cart.price || 0 : cart.priceRub || cart.price || 0
+
+        return sum + currentPrice * (cart.quantity || 1)
+      }, 0),
+    [carts, currency]
   )
 
   return (
