@@ -58,18 +58,44 @@ function BasketFormSidebar({
   )
 
   // 2) Сумма до скидки: если есть originalPrice — берём его, иначе price
-  const totalOriginal = useMemo(
-    () =>
-      carts.reduce((sum, cart) => {
-        // Calculate price based on current currency
-        const currentPrice =
-          currency === 'BYN' ? cart.priceByn || cart.price || 0 : cart.priceRub || cart.price || 0
+  const totalOriginal = useMemo(() => {
+    console.log('=== Calculating totalOriginal ===')
+    console.log('Current currency:', currency)
 
-        const orig = cart.originalPrice !== undefined ? cart.originalPrice : currentPrice
-        return sum + (orig !== undefined ? orig * (cart.quantity || 1) : 0)
-      }, 0),
-    [carts, currency]
-  )
+    const result = carts.reduce((sum, cart) => {
+      // Calculate current price based on current currency
+      const currentPrice =
+        currency === 'BYN' ? cart.priceByn || cart.price || 0 : cart.priceRub || cart.price || 0
+
+      // Calculate original price based on current currency
+      // If there's a discount (originalPrice exists), we need to get the original price in current currency
+      let originalPrice = currentPrice
+
+      if (cart.originalPrice !== undefined && cart.sale) {
+        // If we have originalPrice and sale, calculate what the original price should be in current currency
+        // currentPrice = originalPrice * (1 - sale/100)
+        // So: originalPrice = currentPrice / (1 - sale/100)
+        originalPrice = currentPrice / (1 - cart.sale / 100)
+      }
+
+      console.log(`Item ${cart.id}:`, {
+        priceByn: cart.priceByn,
+        priceRub: cart.priceRub,
+        price: cart.price,
+        originalPrice: cart.originalPrice,
+        sale: cart.sale,
+        currentPrice,
+        calculatedOriginalPrice: originalPrice,
+        quantity: cart.quantity || 1,
+        itemTotal: originalPrice * (cart.quantity || 1),
+      })
+
+      return sum + originalPrice * (cart.quantity || 1)
+    }, 0)
+
+    console.log('Total original:', result)
+    return result
+  }, [carts, currency])
 
   // 4) Ваша экономия
   const totalDiscount = totalOriginal - totalDiscounted
@@ -175,17 +201,26 @@ export const Basket = () => {
   }
 
   // Calculate total discounted amount for the entire cart based on current currency
-  const totalDiscounted = useMemo(
-    () =>
-      carts.reduce((sum, cart) => {
-        // Calculate price based on current currency
-        const currentPrice =
-          currency === 'BYN' ? cart.priceByn || cart.price || 0 : cart.priceRub || cart.price || 0
+  const totalDiscounted = useMemo(() => {
+    console.log('=== Calculating totalDiscounted ===')
 
-        return sum + currentPrice * (cart.quantity || 1)
-      }, 0),
-    [carts, currency]
-  )
+    const result = carts.reduce((sum, cart) => {
+      // Calculate price based on current currency
+      const currentPrice =
+        currency === 'BYN' ? cart.priceByn || cart.price || 0 : cart.priceRub || cart.price || 0
+
+      console.log(`Discounted Item ${cart.id}:`, {
+        currentPrice,
+        quantity: cart.quantity || 1,
+        itemTotal: currentPrice * (cart.quantity || 1),
+      })
+
+      return sum + currentPrice * (cart.quantity || 1)
+    }, 0)
+
+    console.log('Total discounted:', result)
+    return result
+  }, [carts, currency])
 
   return (
     <div className="bg-bg-secondary/20 min-w-[20em]">
