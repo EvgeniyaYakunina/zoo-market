@@ -42,7 +42,7 @@ export const Card = ({ product }: CardProps) => {
   // пересчёт цены при наличии скидки
   const discountedPrice =
     basePrice != null && sale != null ? +(basePrice * (1 - sale / 100)).toFixed(2) : null
-  console.log(discountedPrice)
+
   const order = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
   const availableSizes =
     characteristics

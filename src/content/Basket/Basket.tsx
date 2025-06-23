@@ -1,16 +1,16 @@
-import { BasketList, Button, OrderModal, ResultModal } from '@/components'
-import { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/router'
-import { ROUTES } from '@/utils/routes'
-import { CartItem } from '@/hooks'
-import { OrderFormData } from '@/components/OrderModal/OrderModal'
-import { useSelector } from 'react-redux'
 import { RootState } from '@/app/store'
+import { loadCartFromStorage, clearCart } from '@/app/store/slices/cartSlice'
+import { BasketList, Button, OrderModal, ResultModal } from '@/components'
+import { OrderFormData } from '@/components/OrderModal/OrderModal'
+import { CartItem } from '@/hooks'
+import { ROUTES } from '@/utils/routes'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 
 type BasketFormSidebarProps = {
   carts: CartItem[]
   totalDiscounted: number
-  setCarts: (carts: CartItem[]) => void
   onOrderResult: (success: boolean) => void
 }
 
@@ -39,12 +39,8 @@ const createOrderObject = (formData: OrderFormData, carts: CartItem[], totalAmou
   status: 'new',
 })
 
-function BasketFormSidebar({
-  carts,
-  totalDiscounted,
-  setCarts,
-  onOrderResult,
-}: BasketFormSidebarProps) {
+function BasketFormSidebar({ carts, totalDiscounted, onOrderResult }: BasketFormSidebarProps) {
+  const dispatch = useDispatch()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Get current currency from Redux store
@@ -59,10 +55,8 @@ function BasketFormSidebar({
 
   // 2) Сумма до скидки: если есть originalPrice — берём его, иначе price
   const totalOriginal = useMemo(() => {
-    console.log('=== Calculating totalOriginal ===')
-    console.log('Current currency:', currency)
-
-    const result = carts.reduce((sum, cart) => {
+    // Calculate based on current currency
+    return carts.reduce((sum, cart) => {
       // Calculate current price based on current currency
       const currentPrice =
         currency === 'BYN' ? cart.priceByn || cart.price || 0 : cart.priceRub || cart.price || 0
@@ -78,23 +72,8 @@ function BasketFormSidebar({
         originalPrice = currentPrice / (1 - cart.sale / 100)
       }
 
-      console.log(`Item ${cart.id}:`, {
-        priceByn: cart.priceByn,
-        priceRub: cart.priceRub,
-        price: cart.price,
-        originalPrice: cart.originalPrice,
-        sale: cart.sale,
-        currentPrice,
-        calculatedOriginalPrice: originalPrice,
-        quantity: cart.quantity || 1,
-        itemTotal: originalPrice * (cart.quantity || 1),
-      })
-
       return sum + originalPrice * (cart.quantity || 1)
     }, 0)
-
-    console.log('Total original:', result)
-    return result
   }, [carts, currency])
 
   // 4) Ваша экономия
@@ -117,10 +96,8 @@ function BasketFormSidebar({
     const updatedOrders = [...existingOrders, newOrder]
     localStorage.setItem('orderHistory', JSON.stringify(updatedOrders))
 
-    // Очистить корзину
-    localStorage.setItem('cart', JSON.stringify([]))
-    setCarts([])
-    window.dispatchEvent(new Event('cartUpdated'))
+    // Очистить корзину через Redux
+    dispatch(clearCart())
 
     onOrderResult(true)
     setIsModalOpen(false)
@@ -172,10 +149,12 @@ function BasketFormSidebar({
 
 export const Basket = () => {
   const router = useRouter()
-  const [carts, setCarts] = useState<CartItem[]>([])
+  const dispatch = useDispatch()
   const [showResultModal, setShowResultModal] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
 
+  // Get cart items from Redux store
+  const { items: carts, isLoaded } = useSelector((state: RootState) => state.cart)
   // Get current currency from Redux store
   const currency = useSelector((state: RootState) => state.currency.value)
 
@@ -183,18 +162,12 @@ export const Basket = () => {
     router.push(ROUTES.HOME)
   }
 
+  // Load cart from localStorage on component mount
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
-    setCarts(storedCart)
-
-    const onCartUpdated = () => {
-      const updatedCart = JSON.parse(localStorage.getItem('cart') || '[]')
-      setCarts(updatedCart)
+    if (!isLoaded) {
+      dispatch(loadCartFromStorage())
     }
-
-    window.addEventListener('cartUpdated', onCartUpdated)
-    return () => window.removeEventListener('cartUpdated', onCartUpdated)
-  }, [])
+  }, [dispatch, isLoaded])
 
   const handleOrderResult = (success: boolean) => {
     setOrderSuccess(success)
@@ -203,24 +176,13 @@ export const Basket = () => {
 
   // Calculate total discounted amount for the entire cart based on current currency
   const totalDiscounted = useMemo(() => {
-    console.log('=== Calculating totalDiscounted ===')
-
-    const result = carts.reduce((sum, cart) => {
+    return carts.reduce((sum, cart) => {
       // Calculate price based on current currency
       const currentPrice =
         currency === 'BYN' ? cart.priceByn || cart.price || 0 : cart.priceRub || cart.price || 0
 
-      console.log(`Discounted Item ${cart.id}:`, {
-        currentPrice,
-        quantity: cart.quantity || 1,
-        itemTotal: currentPrice * (cart.quantity || 1),
-      })
-
       return sum + currentPrice * (cart.quantity || 1)
     }, 0)
-
-    console.log('Total discounted:', result)
-    return result
   }, [carts, currency])
 
   return (
@@ -238,13 +200,12 @@ export const Basket = () => {
       ) : (
         <div className="flex flex-col lg:flex-row gap-8 p-8 mx-8">
           <div className="flex-1">
-            <BasketList carts={carts} setCarts={setCarts} />
+            <BasketList carts={carts} />
           </div>
           <div className="w-full lg:w-[360px]">
             <BasketFormSidebar
               carts={carts}
               totalDiscounted={totalDiscounted}
-              setCarts={setCarts}
               onOrderResult={handleOrderResult}
             />
           </div>

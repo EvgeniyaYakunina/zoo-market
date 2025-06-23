@@ -1,22 +1,23 @@
 import { noImage } from '@/assets'
 import { CartItem } from '@/hooks'
 import Image from 'next/image'
-import { useState } from 'react'
 import { MdOutlineDeleteOutline } from 'react-icons/md'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '@/app/store'
+import { removeItem, updateItemSizeQuantities } from '@/app/store/slices/cartSlice'
+import { useRouter } from 'next/router'
 
 export type CartProps = {
   cart: CartItem
-  setCarts: (carts: CartItem[]) => void
-  carts: CartItem[]
 }
 
 type SizeQuantity = {
   [key: string]: number
 }
 
-function BasketItem({ cart, setCarts }: CartProps) {
+function BasketItem({ cart }: CartProps) {
+  const dispatch = useDispatch()
+  const router = useRouter()
   const { price, availableSizes, priceByn, priceRub } = cart
 
   // Get current currency from Redux store
@@ -27,37 +28,19 @@ function BasketItem({ cart, setCarts }: CartProps) {
   const currentPrice = currency === 'BYN' ? priceByn || price || 0 : priceRub || price || 0
   const roundPrice = Math.floor(currentPrice)
 
-  // Состояние для количества
-  const [sizeQuantities, setSizeQuantities] = useState<SizeQuantity>(() => {
-    if (!availableSizes) {
-      return { default: cart.quantity || 1 }
-    }
-    const initialSizes = availableSizes.reduce((acc, size, index) => {
-      acc[size.value] = index === 0 ? 1 : 0
-      return acc
-    }, {} as SizeQuantity)
-    return initialSizes
-  })
+  // Получаем размеры из Redux store (из cart)
+  const sizeQuantities: SizeQuantity =
+    cart.sizeQuantities ||
+    (availableSizes
+      ? availableSizes.reduce((acc, size, index) => {
+          acc[size.value] = index === 0 ? 1 : 0
+          return acc
+        }, {} as SizeQuantity)
+      : { default: cart.quantity || 1 })
 
   const totalQuantity = availableSizes
     ? Object.values(sizeQuantities).reduce((sum, qty) => sum + qty, 0)
     : sizeQuantities.default
-
-  const updateCartItemQuantity = (newQuantities: SizeQuantity) => {
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
-    const updatedCarts = storedCart.map((item: CartItem) =>
-      item.id === cart.id
-        ? {
-            ...item,
-            quantity: Object.values(newQuantities).reduce((sum, qty) => sum + qty, 0),
-            sizeQuantities: newQuantities,
-          }
-        : item
-    )
-    localStorage.setItem('cart', JSON.stringify(updatedCarts))
-    setCarts(updatedCarts)
-    window.dispatchEvent(new Event('cartUpdated'))
-  }
 
   // Общие классы для кнопок
   const btnCls = `
@@ -74,45 +57,41 @@ function BasketItem({ cart, setCarts }: CartProps) {
     const maxQ = availableSizes?.find(s => s.value === size)?.quantity || 99
     if (sizeQuantities[size] < maxQ) {
       const updated = { ...sizeQuantities, [size]: sizeQuantities[size] + 1 }
-      setSizeQuantities(updated)
-      updateCartItemQuantity(updated)
+      dispatch(updateItemSizeQuantities({ id: cart.id, sizeQuantities: updated }))
     }
   }
 
   const decrementSize = (size: string) => {
     if (sizeQuantities[size] > 0) {
       const updated = { ...sizeQuantities, [size]: sizeQuantities[size] - 1 }
-      setSizeQuantities(updated)
-      updateCartItemQuantity(updated)
+      dispatch(updateItemSizeQuantities({ id: cart.id, sizeQuantities: updated }))
     }
   }
 
   const increment = () => {
     const updated = { default: sizeQuantities.default + 1 }
-    setSizeQuantities(updated)
-    updateCartItemQuantity(updated)
+    dispatch(updateItemSizeQuantities({ id: cart.id, sizeQuantities: updated }))
   }
 
   const decrement = () => {
     if (sizeQuantities.default > 1) {
       const updated = { default: sizeQuantities.default - 1 }
-      setSizeQuantities(updated)
-      updateCartItemQuantity(updated)
+      dispatch(updateItemSizeQuantities({ id: cart.id, sizeQuantities: updated }))
     }
   }
 
   const deleteCartItem = () => {
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
-    const filtered = storedCart.filter((item: CartItem) => item.id !== cart.id)
-    localStorage.setItem('cart', JSON.stringify(filtered))
-    setCarts(filtered)
-    window.dispatchEvent(new Event('cartUpdated'))
+    dispatch(removeItem(cart.id))
+  }
+
+  const goToProduct = () => {
+    router.push(`/card/${cart.id}`)
   }
 
   return (
     <div className="flex items-center justify-between mt-4">
       {/* 1) Изображение + название */}
-      <div className="flex items-center flex-1 min-w-0">
+      <div className="flex items-center flex-1 min-w-0 cursor-pointer" onClick={goToProduct}>
         <Image
           src={cart.image || noImage}
           alt={cart.title}
@@ -166,13 +145,7 @@ function BasketItem({ cart, setCarts }: CartProps) {
   )
 }
 
-export const BasketList = ({
-  carts,
-  setCarts,
-}: {
-  carts: CartItem[]
-  setCarts: (carts: CartItem[]) => void
-}) => {
+export const BasketList = ({ carts }: { carts: CartItem[] }) => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">
@@ -180,7 +153,7 @@ export const BasketList = ({
       </h2>
 
       {carts.map(cartItem => (
-        <BasketItem key={cartItem.id} cart={cartItem} carts={carts} setCarts={setCarts} />
+        <BasketItem key={cartItem.id} cart={cartItem} />
       ))}
     </div>
   )

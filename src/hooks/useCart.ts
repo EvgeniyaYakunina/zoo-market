@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { StaticImageData } from 'next/image'
+import { useSelector, useDispatch } from 'react-redux'
+import { RootState } from '@/app/store'
+import { addItem, loadCartFromStorage } from '@/app/store/slices/cartSlice'
 
 export type Size = {
   value: string
@@ -27,28 +30,34 @@ export type CartItem = {
 }
 
 export const useCart = (productId: number, productData?: Omit<CartItem, 'quantity'>) => {
+  const dispatch = useDispatch()
+  const cartItems = useSelector((state: RootState) => state.cart.items)
+  const isLoaded = useSelector((state: RootState) => state.cart.isLoaded)
   const [isInCart, setIsInCart] = useState(false)
 
-  // Проверяем, есть ли товар в корзине при загрузке
+  // Загружаем корзину из localStorage только при первой загрузке
   useEffect(() => {
-    const cartItems: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]')
+    if (!isLoaded) {
+      dispatch(loadCartFromStorage())
+    }
+  }, [dispatch, isLoaded])
+
+  // Отдельный эффект для проверки наличия товара в корзине
+  useEffect(() => {
     setIsInCart(cartItems.some(item => item.id === productId))
-  }, [productId])
+  }, [productId, cartItems])
 
   const addToCart = () => {
     if (!productData) return
 
-    const storedCart: CartItem[] = JSON.parse(localStorage.getItem('cart') || '[]')
-    const productToAdd: CartItem = {
-      ...productData,
-      quantity: 1,
-    }
+    if (!isInCart) {
+      const productToAdd: CartItem = {
+        ...productData,
+        quantity: 1,
+      }
 
-    if (!storedCart.some(item => item.id === productToAdd.id)) {
-      const updatedCart = [...storedCart, productToAdd]
-      localStorage.setItem('cart', JSON.stringify(updatedCart))
+      dispatch(addItem(productToAdd))
       setIsInCart(true)
-      window.dispatchEvent(new Event('cartUpdated')) // Обновляем Header
     }
   }
 
