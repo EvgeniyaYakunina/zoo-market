@@ -5,6 +5,7 @@ import { MdOutlineDeleteOutline } from 'react-icons/md'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '@/app/store'
 import { removeItem, updateItemSizeQuantities } from '@/app/store/slices/cartSlice'
+import { useRouter } from 'next/router'
 
 export type CartProps = {
   cart: CartItem
@@ -16,6 +17,7 @@ type SizeQuantity = {
 
 function BasketItem({ cart }: CartProps) {
   const dispatch = useDispatch()
+  const router = useRouter()
   const { price, availableSizes, priceByn, priceRub } = cart
 
   // Get current currency from Redux store
@@ -82,10 +84,14 @@ function BasketItem({ cart }: CartProps) {
     dispatch(removeItem(cart.id))
   }
 
+  const goToProduct = () => {
+    router.push(`/card/${cart.id}`)
+  }
+
   return (
     <div className="flex items-center justify-between mt-4">
       {/* 1) Изображение + название */}
-      <div className="flex items-center flex-1 min-w-0">
+      <div className="flex items-center flex-1 min-w-0 cursor-pointer" onClick={goToProduct}>
         <Image
           src={cart.image || noImage}
           alt={cart.title}
