@@ -1,16 +1,16 @@
-import { BasketList, Button, OrderModal, ResultModal } from '@/components'
-import { useEffect, useMemo, useState } from 'react'
-import { useRouter } from 'next/router'
-import { ROUTES } from '@/utils/routes'
-import { CartItem } from '@/hooks'
-import { OrderFormData } from '@/components/OrderModal/OrderModal'
-import { useSelector } from 'react-redux'
 import { RootState } from '@/app/store'
+import { loadCartFromStorage, clearCart } from '@/app/store/slices/cartSlice'
+import { BasketList, Button, OrderModal, ResultModal } from '@/components'
+import { OrderFormData } from '@/components/OrderModal/OrderModal'
+import { CartItem } from '@/hooks'
+import { ROUTES } from '@/utils/routes'
+import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 
 type BasketFormSidebarProps = {
   carts: CartItem[]
   totalDiscounted: number
-  setCarts: (carts: CartItem[]) => void
   onOrderResult: (success: boolean) => void
 }
 
@@ -39,12 +39,8 @@ const createOrderObject = (formData: OrderFormData, carts: CartItem[], totalAmou
   status: 'new',
 })
 
-function BasketFormSidebar({
-  carts,
-  totalDiscounted,
-  setCarts,
-  onOrderResult,
-}: BasketFormSidebarProps) {
+function BasketFormSidebar({ carts, totalDiscounted, onOrderResult }: BasketFormSidebarProps) {
+  const dispatch = useDispatch()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Get current currency from Redux store
@@ -117,10 +113,8 @@ function BasketFormSidebar({
     const updatedOrders = [...existingOrders, newOrder]
     localStorage.setItem('orderHistory', JSON.stringify(updatedOrders))
 
-    // Очистить корзину
-    localStorage.setItem('cart', JSON.stringify([]))
-    setCarts([])
-    window.dispatchEvent(new Event('cartUpdated'))
+    // Очистить корзину через Redux
+    dispatch(clearCart())
 
     onOrderResult(true)
     setIsModalOpen(false)
@@ -172,10 +166,12 @@ function BasketFormSidebar({
 
 export const Basket = () => {
   const router = useRouter()
-  const [carts, setCarts] = useState<CartItem[]>([])
+  const dispatch = useDispatch()
   const [showResultModal, setShowResultModal] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
 
+  // Get cart items from Redux store
+  const { items: carts, isLoaded } = useSelector((state: RootState) => state.cart)
   // Get current currency from Redux store
   const currency = useSelector((state: RootState) => state.currency.value)
 
@@ -183,18 +179,12 @@ export const Basket = () => {
     router.push(ROUTES.HOME)
   }
 
+  // Load cart from localStorage on component mount
   useEffect(() => {
-    const storedCart = JSON.parse(localStorage.getItem('cart') || '[]')
-    setCarts(storedCart)
-
-    const onCartUpdated = () => {
-      const updatedCart = JSON.parse(localStorage.getItem('cart') || '[]')
-      setCarts(updatedCart)
+    if (!isLoaded) {
+      dispatch(loadCartFromStorage())
     }
-
-    window.addEventListener('cartUpdated', onCartUpdated)
-    return () => window.removeEventListener('cartUpdated', onCartUpdated)
-  }, [])
+  }, [dispatch, isLoaded])
 
   const handleOrderResult = (success: boolean) => {
     setOrderSuccess(success)
@@ -238,13 +228,12 @@ export const Basket = () => {
       ) : (
         <div className="flex flex-col lg:flex-row gap-8 p-8 mx-8">
           <div className="flex-1">
-            <BasketList carts={carts} setCarts={setCarts} />
+            <BasketList carts={carts} />
           </div>
           <div className="w-full lg:w-[360px]">
             <BasketFormSidebar
               carts={carts}
               totalDiscounted={totalDiscounted}
-              setCarts={setCarts}
               onOrderResult={handleOrderResult}
             />
           </div>

@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import searchSlice from '@/app/store/slices/searchSlice'
 import currencySlice from '@/app/store/slices/currencySlice'
 import cardsSlice from '@/app/store/slices/cardsSlice'
+import cartSlice from '@/app/store/slices/cartSlice'
 
 export const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ export const store = configureStore({
     cards: cardsSlice,
     search: searchSlice,
     currency: currencySlice,
+    cart: cartSlice,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware().concat(api.middleware),
 })
