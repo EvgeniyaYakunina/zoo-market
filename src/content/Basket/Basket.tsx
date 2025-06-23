@@ -164,6 +164,7 @@ function BasketFormSidebar({
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleOrderSubmit}
         onOrderResult={onOrderResult}
+        carts={carts}
       />
     </div>
   )

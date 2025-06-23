@@ -22,6 +22,8 @@ export type CartItem = {
   // prices in different currencies
   priceByn?: number | null
   priceRub?: number | null
+  // quantity per size for items with multiple sizes
+  sizeQuantities?: { [key: string]: number }
 }
 
 export const useCart = (productId: number, productData?: Omit<CartItem, 'quantity'>) => {
