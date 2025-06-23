@@ -141,7 +141,6 @@ const Sidebar = ({ className, onApplyFilters, filters, isLoading }: SidebarProps
 const CardWrapper = ({ card }: { card: CardItem }) => {
   return (
     <Card
-      key={card.nodeId}
       product={{
         image: String(card.images[0] || noImage),
         price: 0,

@@ -32,18 +32,20 @@ export type CartItem = {
 export const useCart = (productId: number, productData?: Omit<CartItem, 'quantity'>) => {
   const dispatch = useDispatch()
   const cartItems = useSelector((state: RootState) => state.cart.items)
+  const isLoaded = useSelector((state: RootState) => state.cart.isLoaded)
   const [isInCart, setIsInCart] = useState(false)
 
-  // Проверяем, есть ли товар в корзине при загрузке
+  // Загружаем корзину из localStorage только при первой загрузке
   useEffect(() => {
-    // Загружаем корзину из localStorage при первой загрузке
-    if (cartItems.length === 0) {
+    if (!isLoaded) {
       dispatch(loadCartFromStorage())
     }
+  }, [dispatch, isLoaded])
 
-    // Проверяем наличие товара в корзине
+  // Отдельный эффект для проверки наличия товара в корзине
+  useEffect(() => {
     setIsInCart(cartItems.some(item => item.id === productId))
-  }, [productId, cartItems, dispatch])
+  }, [productId, cartItems])
 
   const addToCart = () => {
     if (!productData) return

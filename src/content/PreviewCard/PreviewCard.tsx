@@ -99,7 +99,7 @@ export const PreviewCard = () => {
     priceRub: cardInfo?.priceRub,
     availableSizes: availableSizes.length > 0 ? availableSizes : undefined,
   }
-  console.log('cardInfo', cardInfo)
+
   const { isInCart, addToCart } = useCart(Number(id), productData)
   // const flavors = []
 
