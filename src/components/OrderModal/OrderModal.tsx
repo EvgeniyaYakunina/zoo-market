@@ -2,12 +2,16 @@ import { useState } from 'react'
 import PhoneInput from 'react-phone-number-input'
 import 'react-phone-number-input/style.css'
 import { ButtonSpinner } from '../ButtonSpinner'
+import { useCreateOrderMutation } from '@/app/api'
+import { CartItem } from '@/hooks'
+import { OrderItem } from '@/app/api/api.types'
 
 type OrderModalProps = {
   isOpen: boolean
   onClose: () => void
   onSubmit: (formData: OrderFormData) => void
   onOrderResult: (success: boolean) => void
+  carts: CartItem[]
 }
 
 export type OrderFormData = {
@@ -18,20 +22,16 @@ export type OrderFormData = {
   comment?: string
 }
 
-// TODO: Replace with real API call when backend is ready
-const fakeSubmitOrder = async (_formData: OrderFormData): Promise<boolean> => {
-  try {
-    // Эмулируем отправку на сервер
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    return true // В реальном приложении здесь будет проверка ответа от сервера
-  } catch (error) {
-    console.error('Error submitting order:', error)
-    return false
-  }
-}
-
-export const OrderModal = ({ isOpen, onClose, onSubmit, onOrderResult }: OrderModalProps) => {
+export const OrderModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  onOrderResult,
+  carts,
+}: OrderModalProps) => {
   const [isLoading, setIsLoading] = useState(false)
+  const [createOrder] = useCreateOrderMutation()
+
   const [formData, setFormData] = useState<OrderFormData>({
     phone: '',
     fullName: '',
@@ -83,19 +83,60 @@ export const OrderModal = ({ isOpen, onClose, onSubmit, onOrderResult }: OrderMo
     return Object.keys(newErrors).length === 0
   }
 
+  // Convert cart items to order items format
+  const convertCartsToOrderItems = (carts: CartItem[]): OrderItem[] => {
+    const orderItems: OrderItem[] = []
+
+    carts.forEach(cart => {
+      if (cart.availableSizes) {
+        // Handle items with sizes
+        if (cart.sizeQuantities) {
+          // Use existing sizeQuantities if available
+          Object.entries(cart.sizeQuantities).forEach(([size, quantity]) => {
+            if (quantity > 0) {
+              orderItems.push({
+                nodeId: cart.id,
+                size: size === 'default' ? null : size,
+                amount: quantity,
+              })
+            }
+          })
+        } else {
+          // Fallback: if sizeQuantities not set, use cart.quantity for first available size
+          const firstSize = cart.availableSizes[0]
+          orderItems.push({
+            nodeId: cart.id,
+            size: firstSize.value,
+            amount: cart.quantity || 1,
+          })
+        }
+      } else {
+        // Handle items without sizes
+        orderItems.push({
+          nodeId: cart.id,
+          size: null,
+          amount: cart.quantity || 1,
+        })
+      }
+    })
+
+    return orderItems
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (validateForm()) {
       setIsLoading(true)
       try {
-        const success = await fakeSubmitOrder(formData)
-        if (success) {
-          onClose()
-          onSubmit(formData)
-          onOrderResult(true)
-        } else {
-          onOrderResult(false)
-        }
+        const orderItems = convertCartsToOrderItems(carts)
+
+        const result = await createOrder(orderItems).unwrap()
+
+        console.log('Order created successfully:', result)
+
+        onClose()
+        onSubmit(formData)
+        onOrderResult(true)
       } catch (error) {
         console.error('Error submitting order:', error)
         onOrderResult(false)

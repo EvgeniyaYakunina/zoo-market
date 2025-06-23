@@ -4,6 +4,8 @@ import { useRouter } from 'next/router'
 import { ROUTES } from '@/utils/routes'
 import { CartItem } from '@/hooks'
 import { OrderFormData } from '@/components/OrderModal/OrderModal'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/app/store'
 
 type BasketFormSidebarProps = {
   carts: CartItem[]
@@ -45,6 +47,10 @@ function BasketFormSidebar({
 }: BasketFormSidebarProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  // Get current currency from Redux store
+  const currency = useSelector((state: RootState) => state.currency.value)
+  const symbol = currency === 'BYN' ? 'Br' : '₽'
+
   // 1) Общее количество штук
   const totalItems = useMemo(
     () => carts.reduce((sum, cart) => sum + (cart.quantity || 1), 0),
@@ -52,14 +58,44 @@ function BasketFormSidebar({
   )
 
   // 2) Сумма до скидки: если есть originalPrice — берём его, иначе price
-  const totalOriginal = useMemo(
-    () =>
-      carts.reduce((sum, cart) => {
-        const orig = cart.originalPrice !== undefined ? cart.originalPrice : cart.price
-        return sum + (orig !== undefined ? orig * (cart.quantity || 1) : 0)
-      }, 0),
-    [carts]
-  )
+  const totalOriginal = useMemo(() => {
+    console.log('=== Calculating totalOriginal ===')
+    console.log('Current currency:', currency)
+
+    const result = carts.reduce((sum, cart) => {
+      // Calculate current price based on current currency
+      const currentPrice =
+        currency === 'BYN' ? cart.priceByn || cart.price || 0 : cart.priceRub || cart.price || 0
+
+      // Calculate original price based on current currency
+      // If there's a discount (originalPrice exists), we need to get the original price in current currency
+      let originalPrice = currentPrice
+
+      if (cart.originalPrice !== undefined && cart.sale) {
+        // If we have originalPrice and sale, calculate what the original price should be in current currency
+        // currentPrice = originalPrice * (1 - sale/100)
+        // So: originalPrice = currentPrice / (1 - sale/100)
+        originalPrice = currentPrice / (1 - cart.sale / 100)
+      }
+
+      console.log(`Item ${cart.id}:`, {
+        priceByn: cart.priceByn,
+        priceRub: cart.priceRub,
+        price: cart.price,
+        originalPrice: cart.originalPrice,
+        sale: cart.sale,
+        currentPrice,
+        calculatedOriginalPrice: originalPrice,
+        quantity: cart.quantity || 1,
+        itemTotal: originalPrice * (cart.quantity || 1),
+      })
+
+      return sum + originalPrice * (cart.quantity || 1)
+    }, 0)
+
+    console.log('Total original:', result)
+    return result
+  }, [carts, currency])
 
   // 4) Ваша экономия
   const totalDiscount = totalOriginal - totalDiscounted
@@ -98,15 +134,21 @@ function BasketFormSidebar({
           <div className="mb-6">
             <div className="flex justify-between mb-1 text-sm text-text-primary">
               <span>Товары, {totalItems} шт.</span>
-              <span>{fmt(totalOriginal)} р.</span>
+              <span>
+                {fmt(totalOriginal)} {symbol}
+              </span>
             </div>
             <div className="flex justify-between mb-4 text-sm text-discount">
               <span>Моя скидка</span>
-              <span>{discountLabel} р.</span>
+              <span>
+                {discountLabel} {symbol}
+              </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-2xl font-bold">Итого</span>
-              <span className="text-2xl font-bold">{fmt(totalDiscounted)} р.</span>
+              <span className="text-2xl font-bold">
+                {fmt(totalDiscounted)} {symbol}
+              </span>
             </div>
           </div>
 
@@ -122,6 +164,7 @@ function BasketFormSidebar({
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleOrderSubmit}
         onOrderResult={onOrderResult}
+        carts={carts}
       />
     </div>
   )
@@ -132,6 +175,9 @@ export const Basket = () => {
   const [carts, setCarts] = useState<CartItem[]>([])
   const [showResultModal, setShowResultModal] = useState(false)
   const [orderSuccess, setOrderSuccess] = useState(false)
+
+  // Get current currency from Redux store
+  const currency = useSelector((state: RootState) => state.currency.value)
 
   const handleBackToMain = () => {
     router.push(ROUTES.HOME)
@@ -155,11 +201,27 @@ export const Basket = () => {
     setShowResultModal(true)
   }
 
-  // Calculate total discounted amount for the entire cart
-  const totalDiscounted = useMemo(
-    () => carts.reduce((sum, cart) => sum + (cart.price ?? 0) * (cart.quantity || 1), 0),
-    [carts]
-  )
+  // Calculate total discounted amount for the entire cart based on current currency
+  const totalDiscounted = useMemo(() => {
+    console.log('=== Calculating totalDiscounted ===')
+
+    const result = carts.reduce((sum, cart) => {
+      // Calculate price based on current currency
+      const currentPrice =
+        currency === 'BYN' ? cart.priceByn || cart.price || 0 : cart.priceRub || cart.price || 0
+
+      console.log(`Discounted Item ${cart.id}:`, {
+        currentPrice,
+        quantity: cart.quantity || 1,
+        itemTotal: currentPrice * (cart.quantity || 1),
+      })
+
+      return sum + currentPrice * (cart.quantity || 1)
+    }, 0)
+
+    console.log('Total discounted:', result)
+    return result
+  }, [carts, currency])
 
   return (
     <div className="bg-bg-secondary/20 min-w-[20em]">
