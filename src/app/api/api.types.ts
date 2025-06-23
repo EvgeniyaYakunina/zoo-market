@@ -190,3 +190,9 @@ export type AllCardsResponse = {
   pageSize: number
   items: CardItem[]
 }
+
+export type OrderItem = {
+  nodeId: number
+  size: string | null
+  amount: number
+}

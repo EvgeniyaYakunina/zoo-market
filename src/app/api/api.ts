@@ -18,6 +18,7 @@ import {
   CardDetails,
   AllCardsResponse,
   CardItem,
+  OrderItem,
 } from './api.types'
 
 const {
@@ -224,6 +225,13 @@ export const api = createApi({
         body,
       }),
     }),
+    createOrder: builder.mutation<{ orderId: string }, OrderItem[]>({
+      query: orderItems => ({
+        url: 'orders',
+        method: 'POST',
+        body: orderItems,
+      }),
+    }),
 
     //TODO: check need it or not
     // Files
@@ -276,4 +284,5 @@ export const {
   useDeleteFilesByNodeIdMutation,
   useDeleteFileByUuidMutation,
   useUploadFilesMutation,
+  useCreateOrderMutation,
 } = api
